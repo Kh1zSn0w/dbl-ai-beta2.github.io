@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DBL AI Beta</title>
-    <link rel="apple-touch-icon" href="https://i.pinimg.com/564x/8c/6f/cf/8c6fcf6042d7113f8be5ed91ebe1f369.jpg">
+    <link rel="apple-touch-icon" href="https://i.pinimg.com/736x/3c/08/c4/3c08c49ad19da9ac3ebce033f83127ed.jpg">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
@@ -45,6 +45,21 @@
                 display: none;
             }
         }
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 90%;
+        }
+        .message-box p {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -54,6 +69,12 @@
         </video>
     </div>
     <div class="background-video mobile-image">
+        <div class="message-box">
+            <h1>Enhance Your Experience</h1>
+            <p>For a better experience, add this website to your home screen:</p>
+            <p><strong>iOS:</strong> Tap the share icon and select "Add to Home Screen".</p>
+            <p><strong>Android:</strong> Tap the menu icon and select "Add to Home Screen".</p>
+        </div>
     </div>
 
     <script>
@@ -63,28 +84,23 @@
                 mobileImageContainer.style.display = 'block';
             }
         });
+    </script>
 
-        
+    <script>
+        !function(w, d, s, ...args){
+            var div = d.createElement('div');
+            div.id = 'aichatbot';
+            d.body.appendChild(div);
+            w.chatbotConfig = args;
+            var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s);
+            j.defer = true;
+            j.type = 'module';
+            j.src = 'https://aichatbot.sendbird.com/index.js';
+            f.parentNode.insertBefore(j, f);
+        }(window, document, 'script', '7AE83627-E2C5-43A7-9B44-3592D6C36CEE', 'onboarding_bot', {
+            apiHost: 'https://api-cf-us-1.sendbird.com',
+        });
     </script>
 </body>
 </html>
-
-
-<script>
-    !function(w, d, s, ...args){
-      var div = d.createElement('div');
-      div.id = 'aichatbot';
-      d.body.appendChild(div);
-      w.chatbotConfig = args;
-      var f = d.getElementsByTagName(s)[0],
-      j = d.createElement(s);
-      j.defer = true;
-      j.type = 'module';
-      j.src = 'https://aichatbot.sendbird.com/index.js';
-      f.parentNode.insertBefore(j, f);
-    }(window, document, 'script', '7AE83627-E2C5-43A7-9B44-3592D6C36CEE', 'onboarding_bot', {
-      apiHost: 'https://api-cf-us-1.sendbird.com',
-    });
-
-    </script>
-
