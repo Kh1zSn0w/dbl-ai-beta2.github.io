@@ -37,7 +37,6 @@
                 position: relative;
                 width: 100%;
                 height: 100%;
-                background-image: url('https://i.pinimg.com/736x/3a/d9/bd/3ad9bdd8c65fe38a5202225fc2b763e3.jpg');
                 background-size: cover;
                 background-position: center;
             }
@@ -56,6 +55,7 @@
             border-radius: 8px;
             text-align: center;
             max-width: 90%;
+            display: none; /* Initially hide the message box */
         }
         .message-box p {
             margin: 10px 0;
@@ -82,11 +82,36 @@
             var mobileImageContainer = document.querySelector('.mobile-image');
             var messageBox = document.querySelector('.message-box');
             
-            if (window.navigator.standalone) {
+            // Check if the site is running as a standalone app
+            if (window.navigator.standalone || localStorage.getItem('addedToHomeScreen')) {
                 messageBox.style.display = 'none';
-            } else {
+                mobileImageContainer.style.backgroundImage = 'url("https://i.pinimg.com/564x/db/76/22/db76220bcbef58d686f9a8991a724011.jpg")';
+            } else if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                // Only show the message box on mobile devices
+                messageBox.style.display = 'block';
                 mobileImageContainer.style.display = 'block';
             }
+
+            // Listen for the user to add to home screen
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Store the event so it can be triggered later.
+                deferredPrompt = e;
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                        localStorage.setItem('addedToHomeScreen', 'true');
+                        messageBox.style.display = 'none';
+                        mobileImageContainer.style.backgroundImage = 'url("https://i.pinimg.com/564x/db/76/22/db76220bcbef58d686f9a8991a724011.jpg")';
+                    } else {
+                        console.log('User dismissed the A2HS prompt');
+                    }
+                });
+            });
         });
     </script>
 
