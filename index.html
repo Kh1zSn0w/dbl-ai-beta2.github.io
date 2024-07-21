@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DBL AI Beta</title>
-    <link rel="apple-touch-icon" href="https://i.pinimg.com/736x/3c/08/c4/3c08c49ad19da9ac3ebce033f83127ed.jpg">
+    <title>DB LEGENDS AI</title>
+    <link rel="apple-touch-icon" href="https://i.pinimg.com/736x/3c/08/c4/3c08c49ad19da9ac3ebce033f83127ed.jpg"> <!--IOS APP ICON-->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
@@ -14,7 +14,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: black; /* Set the initial background color to black */
+            background-color: black;
         }
         .background-video {
             position: absolute;
@@ -31,7 +31,7 @@
         }
         .mobile-image {
             display: none;
-            background-color: black; /* Ensure the background is black initially */
+            background-color: black; 
         }
         @media (max-width: 767px) {
             .mobile-image {
@@ -57,7 +57,7 @@
             border-radius: 8px;
             text-align: center;
             max-width: 90%;
-            display: none; /* Initially hide the message box */
+            display: none; 
         }
         .message-box p {
             margin: 10px 0;
@@ -86,8 +86,8 @@
             if (window.navigator.standalone || localStorage.getItem('addedToHomeScreen')) {
                 messageBox.style.display = 'none';
                 mobileImageContainer.style.backgroundImage = 'url("https://i.pinimg.com/564x/db/76/22/db76220bcbef58d686f9a8991a724011.jpg")';
-            } else if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                // Only show the message box on mobile devices
+            } else if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) { // USELESS BUT EH
+                // SHOW MESSAGE ON MOBILE DEVICE ONLY
                 messageBox.style.display = 'block';
                 mobileImageContainer.style.display = 'block';
             }
@@ -109,8 +109,9 @@
             });
         });
     </script>
-
+   
     <script>
+        // MAIN DB LEGENDS AI SCRIPT
         !function(w, d, s, ...args){
             var div = d.createElement('div');
             div.id = 'aichatbot';
