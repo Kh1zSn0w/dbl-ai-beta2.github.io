@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dragon Ball Legends Dev Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <!-- iOS Meta Tags -->
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-title" content="Dragon Ball Legends Dev Portal">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
     <style>
         * {
             margin: 0;
@@ -31,7 +40,7 @@
             border-radius: 20px;
             width: 90%;
             max-width: 600px;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(1px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
@@ -151,6 +160,14 @@
 
             logs.forEach((msg, i) => {
                 setTimeout(() => log(msg), i * 200);
+            });
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                console.log('Service Worker registered with scope: ', registration.scope);
+            }).catch(function(error) {
+                console.log('Service Worker registration failed: ', error);
             });
         }
     </script>
