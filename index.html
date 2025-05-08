@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dragon Ball Legends Dev Portal</title>
+    <title>Fortnite Mobile Aimbot</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
-    <!-- iOS Meta Tags -->
-    <link rel="apple-touch-icon" href="icon.png">
-    <meta name="apple-mobile-web-app-title" content="Dragon Ball Legends Dev Portal">
+    <meta name="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-title" content="Fortnite Mobile Aimbot">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -24,7 +22,7 @@
         body {
             font-family: 'Poppins', sans-serif;
             color: white;
-            background: url('https://i.pinimg.com/736x/83/38/7b/83387b5f331481311582f3e879805c12.jpg') center/cover no-repeat;
+            background: url('https://i.pinimg.com/736x/94/2c/38/942c38f36617241462213156ba1c6f96.jpg') center/cover no-repeat;
             background-attachment: fixed;
             min-height: 100vh;
             display: flex;
@@ -35,7 +33,6 @@
         }
 
         .overlay {
-            background-color: rgba(0, 0, 0, 0.75);
             padding: 40px;
             border-radius: 20px;
             width: 90%;
@@ -45,7 +42,7 @@
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
         }
 
@@ -56,7 +53,7 @@
 
         .launch-btn {
             display: inline-block;
-            background-color: #ff2058;
+            background-color: #3E1A8A;
             color: white;
             padding: 12px 30px;
             border: none;
@@ -70,7 +67,7 @@
 
         .launch-btn:hover {
             transform: translateY(-3px);
-            background-color: #ff0e46;
+            background-color: #6A0DAD;
         }
 
         .build-tag {
@@ -97,19 +94,89 @@
             margin-top: 10px;
             font-weight: bold;
         }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 15px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #00ff00;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .options {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+        }
+
+        .options label {
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .options input {
+            margin: 8px 0;
+            display: inline-block;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .option-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .option-row input {
+            width: 60%;
+        }
     </style>
 </head>
 <body>
     <div class="overlay">
-        <h1>Dragon Ball Legends Dev Portal</h1>
-        <p>Developer access panel for internal tools and debugging</p>
+        <h1>Fortnite Cronix</h1>
+        <p>Activate your aimbot to gain perfect aim in every Fortnite match. Customize your settings for the best performance!</p>
 
-        <a href="#" onclick="launch()" class="launch-btn" id="launchBtn">Launch</a>
+        <a href="#" onclick="launch()" class="launch-btn" id="launchBtn">Launch Cronix</a>
 
-        <div class="status" id="statusText">Status: Waiting...</div>
-        <div class="build-tag">Build version 4.34.0</div>
+        <div class="status" id="statusText">Status: Ready</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
         <div class="logbox" id="logBox">
-            <!-- Logs will appear here -->
+        </div>
+
+        <div class="options">
+            <h3>Settings</h3>
+
+            <div class="option-row">
+                <label for="sensitivity">Sensitivity</label>
+                <input type="range" id="sensitivity" min="1" max="10" value="5">
+            </div>
+
+            <div class="option-row">
+                <label for="aimAssist">Aim Assist</label>
+                <input type="checkbox" id="aimAssist" checked>
+            </div>
+
+            <div class="option-row">
+                <label for="triggerbot">Triggerbot</label>
+                <input type="checkbox" id="triggerbot" checked>
+            </div>
         </div>
     </div>
 
@@ -118,21 +185,38 @@
             const logBox = document.getElementById("logBox");
             const status = document.getElementById("statusText");
             const btn = document.getElementById("launchBtn");
+            const progressBar = document.getElementById("progressBar");
 
-            logBox.textContent = "Token ID: FBEBXX94F0XC\n";
-            status.textContent = "Status: Confirming token...";
-            btn.textContent = "Launching...";
+            logBox.textContent = "Initializing...\n";
+            status.textContent = "Status: Verifying...";
+
+            btn.textContent = "Activating...";
 
             setTimeout(() => {
-                log("Verified");
-                log("Caching Login");
-                status.textContent = "Sending to server...";
+                log("Aimbot Verified");
+                log("Caching settings...");
+                updateProgressBar(10);
 
                 setTimeout(() => {
-                    status.textContent = "Status: Online";
-                    btn.textContent = "Launched";
-                    populateLogs();
-                }, 4000);
+                    log("Setting up sensitivity: " + document.getElementById("sensitivity").value);
+                    log("Aim Assist: " + (document.getElementById("aimAssist").checked ? "Enabled" : "Disabled"));
+                    log("Triggerbot: " + (document.getElementById("triggerbot").checked ? "Enabled" : "Disabled"));
+                    updateProgressBar(25);
+
+                    setTimeout(() => {
+                        status.textContent = "Status: Activating Aimbot...";
+                        log("Activating aimbot...");
+                        updateProgressBar(55);
+
+                        setTimeout(() => {
+                            status.textContent = "Status: Aimbot Active";
+                            btn.textContent = "Activated";
+                            log("Aimbot successfully activated!");
+                            populateLogs();
+                            updateProgressBar(100);
+                        }, 3000);
+                    }, 3000);
+                }, 3000);
             }, 2000);
         }
 
@@ -142,25 +226,25 @@
 
         function populateLogs() {
             const logs = [
-                "Authentication (✓)",
-                "Device (✓)",
-                "Pipelines (✓)",
-                "Chrono Crystals set to nil.",
-                "Dev tools (✓)",
-                "Co-op dev tools (✓)",
-                "Animation IDs (✓)",
-                "Data Stores (✓)",
-                "Back end operations (✓)",
-                "In-app purchases (✓)",
-                "Server connections (✓)",
-                "Bug fixes (✓)",
-                "Daily rewards system (✓)",
-                "Localization files (✓)"
+                "Aimbot Initialized (✓)",
+                "Auto Lock On (✓) Enabled",
+                "Auto-aim assist (✓) Enabled",
+                "Crosshair Tracking (✓) Enabled",
+                "Auto Fire (✓) Enabled",
+                "Invisible Player (✓) Available",
+                "No recoil (✓) Enabled",
+                "Server Sync (✓) Successful",
+                "Silent aim (✓) Available"
             ];
 
             logs.forEach((msg, i) => {
                 setTimeout(() => log(msg), i * 200);
             });
+        }
+
+        function updateProgressBar(percentage) {
+            const progressBar = document.getElementById("progressBar");
+            progressBar.style.width = percentage + "%";
         }
 
         if ('serviceWorker' in navigator) {
