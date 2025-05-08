@@ -1,43 +1,158 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DB LEGENDS AI</title><link rel="apple-touch-icon" href="https://i.pinimg.com/736x/3c/08/c4/3c08c49ad19da9ac3ebce033f83127ed.jpg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><style>body,html{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background-color:#000}.background-video{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden}.background-video video{width:100%;height:100%;object-fit:cover}.mobile-image{display:none;background-color:#000}@media (max-width:767px){.mobile-image{display:block;position:relative;width:100%;height:100%;background-size:cover;background-position:center}.desktop-video{display:none}}.message-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background-color:rgba(0,0,0,.8);color:#fff;padding:20px;border-radius:8px;text-align:center;max-width:90%;display:none}.message-box p{margin:10px 0}</style></head><body><div class="background-video desktop-video"><video autoplay loop muted playsinline><source src="https://www.dropbox.com/scl/fi/q19n5gybeygb3yswwmn4v/Dragon-Ball_-Legends-Cinematic-Opening-Intro-4K-60fps-vmake.mp4?rlkey=2i6fk84oc945s4gykqwkon46i&st=y8optv70&raw=1" type="video/mp4"></video></div><div class="background-video mobile-image"><div class="message-box"><h1>Enhance Your DB Legends AI Experience</h1><p>For a better experience, add this website to your home screen:</p><p><strong>iOS:</strong>Tap the share icon and select "Add to Home Screen".</p></div></div><script>document.addEventListener('DOMContentLoaded', function() {
-    var mobileImageContainer = document.querySelector('.mobile-image');
-    var messageBox = document.querySelector('.message-box');
-    
-    if (window.navigator.standalone || localStorage.getItem('addedToHomeScreen')) {
-        messageBox.style.display = 'none';
-        mobileImageContainer.style.backgroundImage = 'url("https://i.pinimg.com/564x/db/76/22/db76220bcbef58d686f9a8991a724011.jpg")';
-    } else if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) { // USELESS BUT EH
-        // SHOW MESSAGE ON MOBILE DEVICE ONLY
-        messageBox.style.display = 'block';
-        mobileImageContainer.style.display = 'block';
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Ball Legends Dev Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
-                localStorage.setItem('addedToHomeScreen', 'true');
-                messageBox.style.display = 'none';
-                mobileImageContainer.style.backgroundImage = 'url("https://i.pinimg.com/564x/db/76/22/db76220bcbef58d686f9a8991a724011.jpg")';
-            } else {
-                console.log('User dismissed the A2HS prompt');
-            }
-        });
-    });
-});</script><script>// MAIN DB LEGENDS AI SCRIPT
-!function(w, d, s, ...args){
-    var div = d.createElement('div');
-    div.id = 'aichatbot';
-    d.body.appendChild(div);
-    w.chatbotConfig = args;
-    var f = d.getElementsByTagName(s)[0],
-    j = d.createElement(s);
-    j.defer = true;
-    j.type = 'module';
-    j.src = 'https://aichatbot.sendbird.com/index.js';
-    f.parentNode.insertBefore(j, f);
-}(window, document, 'script', '7AE83627-E2C5-43A7-9B44-3592D6C36CEE', 'onboarding_bot', {
-    apiHost: 'https://api-cf-us-1.sendbird.com',
-});</script></body></html>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            background: url('https://i.pinimg.com/736x/83/38/7b/83387b5f331481311582f3e879805c12.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            backdrop-filter: blur(3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .launch-btn {
+            display: inline-block;
+            background-color: #ff2058;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .launch-btn:hover {
+            transform: translateY(-3px);
+            background-color: #ff0e46;
+        }
+
+        .build-tag {
+            margin-top: 20px;
+            background: black;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .logbox {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.65);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 0.85rem;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <h1>Dragon Ball Legends Dev Portal</h1>
+        <p>Developer access panel for internal tools and debugging</p>
+
+        <a href="#" onclick="launch()" class="launch-btn" id="launchBtn">Launch</a>
+
+        <div class="status" id="statusText">Status: Waiting...</div>
+        <div class="build-tag">Build version 4.34.0</div>
+        <div class="logbox" id="logBox">
+            <!-- Logs will appear here -->
+        </div>
+    </div>
+
+    <script>
+        function launch() {
+            const logBox = document.getElementById("logBox");
+            const status = document.getElementById("statusText");
+            const btn = document.getElementById("launchBtn");
+
+            logBox.textContent = "Token ID: FBEBXX94F0XC\n";
+            status.textContent = "Status: Confirming token...";
+            btn.textContent = "Launching...";
+
+            setTimeout(() => {
+                log("Verified");
+                log("Caching Login");
+                status.textContent = "Sending to server...";
+
+                setTimeout(() => {
+                    status.textContent = "Status: Online";
+                    btn.textContent = "Launched";
+                    populateLogs();
+                }, 4000);
+            }, 2000);
+        }
+
+        function log(message) {
+            document.getElementById("logBox").textContent += message + "\n";
+        }
+
+        function populateLogs() {
+            const logs = [
+                "Authentication (✓)",
+                "Device (✓)",
+                "Pipelines (✓)",
+                "Chrono Crystals set to nil.",
+                "Dev tools (✓)",
+                "Co-op dev tools (✓)",
+                "Animation IDs (✓)",
+                "Data Stores (✓)",
+                "Back end operations (✓)",
+                "In-app purchases (✓)",
+                "Server connections (✓)",
+                "Bug fixes (✓)",
+                "Daily rewards system (✓)",
+                "Localization files (✓)"
+            ];
+
+            logs.forEach((msg, i) => {
+                setTimeout(() => log(msg), i * 200);
+            });
+        }
+    </script>
+</body>
+</html>
