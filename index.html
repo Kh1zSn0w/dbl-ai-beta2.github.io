@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cronix FNM Optimizer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <title>Cronix FNM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
       color: white;
@@ -14,36 +19,57 @@
       background-attachment: fixed;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
+      text-align: center;
       padding: 20px;
     }
+
     .overlay {
+      padding: 30px 20px;
+      border-radius: 20px;
       width: 100%;
       max-width: 500px;
-      backdrop-filter: blur(5px);
-      background-color: rgba(0, 0, 0, 0.6);
-      padding: 25px;
-      border-radius: 20px;
+      backdrop-filter: blur(2px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.5);
+      position: relative;
     }
-    h1 { font-size: 2rem; margin-bottom: 10px; }
-    p { font-size: 1rem; margin-bottom: 20px; }
-    .launch-btn {
-      width: 100%;
-      background: #3E1A8A;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 30px;
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    p {
       font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background 0.3s;
+      margin-bottom: 25px;
     }
-    .launch-btn:hover { background: #6A0DAD; }
-    .status { margin-top: 15px; font-weight: bold; }
+
+    .launch-btn {
+      background-color: #3E1A8A;
+      color: white;
+      padding: 10px 19px;
+      border: none;
+      border-radius: 20px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .launch-btn:hover {
+      background-color: #6A0DAD;
+      transform: translateY(-2px);
+    }
+
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
     .progress-container {
       width: 100%;
       height: 8px;
@@ -52,71 +78,132 @@
       border-radius: 4px;
       overflow: hidden;
     }
+
     .progress-bar {
       height: 100%;
       width: 0%;
-      background: linear-gradient(to right, #00c6ff, #0072ff);
-      transition: width 1.5s ease-in-out;
+      background: linear-gradient(to right, #007bff, #00c6ff);
+      transition: width 0.4s ease-in-out;
     }
-    .options { margin-top: 30px; }
+
+    .logbox {
+      margin-top: 25px;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 15px;
+      padding: 15px;
+      font-size: 0.85rem;
+      text-align: left;
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .options {
+      margin-top: 25px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 15px;
+    }
+
     .option-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       margin-bottom: 15px;
+      align-items: center;
+      font-size: 0.95rem;
     }
-    label { font-size: 0.95rem; }
-    input[type="range"] {
-      width: 60%;
+
+    .option-row input[type="range"] {
+      width: 55%;
+      margin-left: 10px;
     }
-    input[type="checkbox"] {
-      transform: scale(1.2);
+    .option-row .slider-value {
+      width: 30px;
+      text-align: left;
+      font-weight: 600;
     }
-    .footer {
-      margin-top: 30px;
-      font-size: 0.85rem;
+
+    .option-row input[type="checkbox"] {
+      transform: scale(1.1);
+    }
+
+    .discord-footer {
+      margin-top: 25px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
+      font-size: 0.9rem;
     }
-    .footer img {
+
+    .discord-footer img {
       width: 20px;
       height: 20px;
     }
-    .logbox {
-      margin-top: 20px;
-      background: rgba(0, 0, 0, 0.65);
-      border-radius: 10px;
-      padding: 15px;
-      font-size: 0.85rem;
-      max-height: 150px;
-      overflow-y: auto;
-      white-space: pre-wrap;
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .logbox, .options {
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Modal popup styles */
+    #modalOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #modal {
+      background: #111;
+      border-radius: 15px;
+      padding: 25px 30px;
+      max-width: 350px;
+      text-align: center;
+      box-shadow: 0 0 15px #290f62;
+      color: white;
+    }
+
+    #modal p {
+      margin-bottom: 25px;
+      font-size: 1.1rem;
+    }
+
+    #modal button {
+      background: #290f62;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 10px 24px;
+      margin: 0 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.3s;
+      min-width: 80px;
+    }
+
+    #modal button:hover {
+      background: #290f62;
     }
   </style>
 </head>
 <body>
   <div class="overlay">
-    <h1>Cronix FNM</h1>
-    <p>Ultimate Fortnite Mobile Optimization Tool</p>
-
-    <div class="options">
-      <div class="option-row">
-        <label for="resolution">3D Resolution</label>
-        <input type="range" id="resolution" min="1" max="100" value="50">
-      </div>
-      <div class="option-row">
-        <label for="rayTracing">Enable Ray Tracing (iPhone 15 Pro+)</label>
-        <input type="checkbox" id="rayTracing">
-      </div>
-      <div class="option-row">
-        <label for="physics">Force Physics in Graphics</label>
-        <input type="checkbox" id="physics">
-      </div>
-    </div>
-
-    <button class="launch-btn" onclick="launch()" id="launchBtn">Optimize</button>
+    <h1>Flux (FNM)</h1>
+    <p>Fortnite Mobile Client Optimizer</p>
+    <a href="#" onclick="onLaunchClick()" class="launch-btn" id="launchBtn">Optimize</a>
 
     <div class="status" id="statusText">Status: Ready</div>
     <div class="progress-container">
@@ -125,63 +212,149 @@
 
     <div class="logbox" id="logBox"></div>
 
-    <div class="footer">
-      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png" alt="Discord" />
-      <a href="https://discord.com" target="_blank" style="color: white; text-decoration: none;">Made by Zenyical — Discord</a>
+    <div class="options">
+      <h3 style="margin-bottom: 10px;">Settings</h3>
+      <div class="option-row">
+        <label for="resolution">3D Resolution</label>
+        <input type="range" id="resolution" min="1" max="100" value="100" />
+        <div class="slider-value" id="resolutionValue">100%</div>
+      </div>
+      <div class="option-row">
+        <label for="aimAssist">Ray Tracing iPhone 15 Pro+</label>
+        <input type="checkbox" id="aimAssist" />
+      </div>
+      <div class="option-row">
+        <label for="forcePhysics">Force Physics</label>
+        <input type="checkbox" id="forcePhysics" />
+      </div>
+    </div>
+
+    <div class="discord-footer">
+      <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" alt="Discord" />
+      <a href="https://discord.gg/yourserver" target="_blank" style="color: white; text-decoration: none;">
+        Made by Zenyical — Discord
+      </a>
+    </div>
+  </div>
+
+  <!-- Modal popup -->
+  <div id="modalOverlay">
+    <div id="modal">
+      <p>Warning: Enabling Ray Tracing may cause overheating. Continue?</p>
+      <button id="modalYes">Yes</button>
+      <button id="modalNo">No</button>
     </div>
   </div>
 
   <script>
-    let optimizing = false;
+    const resolutionSlider = document.getElementById('resolution');
+    const resolutionValue = document.getElementById('resolutionValue');
+    const aimAssistCheckbox = document.getElementById('aimAssist'); // ray tracing
+    const forcePhysicsCheckbox = document.getElementById('forcePhysics');
 
-    function launch() {
-      if (optimizing) return;
-      const rayTracing = document.getElementById("rayTracing").checked;
-      if (rayTracing) {
-        const proceed = confirm("Are you sure you want Ray Tracing on? It can impact FPS with high graphic settings.");
-        if (!proceed) return;
-      }
+    const launchBtn = document.getElementById("launchBtn");
+    const logBox = document.getElementById("logBox");
+    const status = document.getElementById("statusText");
+    const progressBar = document.getElementById("progressBar");
 
-      optimizing = true;
-      const btn = document.getElementById("launchBtn");
-      const logBox = document.getElementById("logBox");
-      const status = document.getElementById("statusText");
-      const progressBar = document.getElementById("progressBar");
-      const resolutionSlider = document.getElementById("resolution");
-      resolutionSlider.disabled = true;
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalYes = document.getElementById('modalYes');
+    const modalNo = document.getElementById('modalNo');
 
-      btn.textContent = "Optimizing...";
-      logBox.textContent = "Initializing Optimization...\n";
-      status.textContent = "Status: Starting...";
-      progressBar.style.width = "10%";
+    resolutionValue.textContent = resolutionSlider.value + '%';
 
-      setTimeout(() => {
-        log("Applying 3D Resolution: " + resolutionSlider.value);
-        progressBar.style.width = "25%";
+    resolutionSlider.addEventListener('input', () => {
+      resolutionValue.textContent = resolutionSlider.value + '%';
+    });
+
+    function log(msg) {
+      logBox.textContent += msg + "\n";
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function updateProgressBar(pct) {
+      progressBar.style.width = pct + "%";
+    }
+
+    function lockUI(lock) {
+      resolutionSlider.disabled = lock;
+      aimAssistCheckbox.disabled = lock;
+      forcePhysicsCheckbox.disabled = lock;
+      launchBtn.disabled = lock;
+    }
+
+    function optimize() {
+      launchBtn.textContent = "Launching...";
+      logBox.textContent = "";
+      status.textContent = "Status: Initializing...";
+      updateProgressBar(0);
+      lockUI(true);
+
+      // Base delay
+      const baseDelay = 1500;
+      let delayMultiplier = 1.3;
+
+      // Increase delay based on selected options
+      if (aimAssistCheckbox.checked) delayMultiplier += 0.7;  // Ray tracing adds delay
+      if (forcePhysicsCheckbox.checked) delayMultiplier += 0.8; // Force physics adds delay
+
+      // Dynamic logs
+      const logs = [
+        `3D Resolution: ${resolutionSlider.value}%`,
+        aimAssistCheckbox.checked ? "Ray Tracing: On" : "Ray Tracing: Off",
+        `Force Physics: ${forcePhysicsCheckbox.checked ? "Enabled" : "Disabled"}`
+      ];
+
+      // Steps with delays and logs
+      const steps = [
+        { pct: 5, text: "Loading settings...", log: logs[0], delay: baseDelay * delayMultiplier },
+        { pct: 15, text: "", log: logs[1], delay: baseDelay * 0.8 * delayMultiplier },
+        { pct: 25, text: "", log: logs[2], delay: baseDelay * delayMultiplier },
+        { pct: 45, text: "Initializing physics engine...", log: "Applying force calculations...", delay: baseDelay * 1.3 * delayMultiplier },
+        { pct: 65, text: "Optimizing graphics pipeline...", log: "Balancing GPU load...", delay: baseDelay * 1.3 * delayMultiplier },
+        { pct: 85, text: "Finalizing performance tweaks...", delay: baseDelay * delayMultiplier },
+        { pct: 100, text: "Success", log: "✅ Optimized.", delay: baseDelay * delayMultiplier },
+      ];
+
+      let i = 0;
+      function nextStep() {
+        if (i >= steps.length) {
+          launchBtn.textContent = "Activated";
+          lockUI(false);
+          return;
+        }
+        updateProgressBar(steps[i].pct);
+        status.textContent = "Status: " + steps[i].text;
+        if (steps[i].log) log(steps[i].log);
         setTimeout(() => {
-          log("Ray Tracing: " + (rayTracing ? "Enabled" : "Disabled"));
-          log("Graphics Physics: " + (document.getElementById("physics").checked ? "Forced" : "Default"));
-          progressBar.style.width = "50%";
-          setTimeout(() => {
-            status.textContent = "Status: Finalizing...";
-            log("Finalizing system tweaks...");
-            progressBar.style.width = "75%";
-            setTimeout(() => {
-              log("Optimization Complete ✓");
-              status.textContent = "Status: Optimized";
-              btn.textContent = "Optimized";
-              progressBar.style.width = "100%";
-              resolutionSlider.disabled = false;
-              optimizing = false;
-            }, 2500);
-          }, 2500);
-        }, 2500);
-      }, 2500);
+          i++;
+          nextStep();
+        }, steps[i].delay);
+      }
+      nextStep();
     }
 
-    function log(message) {
-      document.getElementById("logBox").textContent += message + "\n";
+    function onLaunchClick() {
+      if (aimAssistCheckbox.checked) {
+        // Show modal
+        modalOverlay.style.display = "flex";
+      } else {
+        optimize();
+      }
     }
+
+    modalYes.onclick = () => {
+      modalOverlay.style.display = "none";
+      optimize();
+    };
+
+    modalNo.onclick = () => {
+      modalOverlay.style.display = "none";
+      aimAssistCheckbox.checked = false;
+      log("Ray Tracing disabled by user.");
+      optimize();
+    };
   </script>
 </body>
 </html>
+
