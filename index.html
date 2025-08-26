@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cronix — One-Page Control Panel</title>
+<title>Cronix Admin Panel</title>
 <style>
   :root{
     color-scheme: dark light;
@@ -36,10 +36,36 @@
   .btn-danger{border-color:#ef4444}
   .btn-ghost{background:transparent}
 
+  /* ======= RGB rim buttons (Cronix/Ngrok/Generate) ======= */
+  @property --a{syntax:"<angle>"; inherits:false; initial-value:0deg;}
+  @keyframes spin { to { --a: 360deg; } }
+  .btn-rgb{
+    --border-w:2px;
+    position:relative;
+    border:var(--border-w) solid transparent;
+    border-radius:12px;
+    padding:10px 12px;
+    color:var(--text);
+    background:
+      /* inner fill */
+      linear-gradient(var(--btn),var(--btn)) padding-box,
+      /* animated rim */
+      conic-gradient(from var(--a),
+        #ff0000, #ffa500, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
+      ) border-box;
+    animation: spin 6s linear infinite;
+  }
+  .btn-rgb:hover{background:
+      linear-gradient(var(--btn-hover),var(--btn-hover)) padding-box,
+      conic-gradient(from var(--a),
+        #ff0000, #ffa500, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
+      ) border-box;}
+  /* ======================================================= */
+
   .badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid var(--border-strong)}
   .b-ok{background:var(--ok);color:var(--ok-text)}
   .b-bad{background:var(--bad);color:var(--bad-text)}
-  .b-unk{background:#2a2330;color:#f7a7ff}
+  .b-unk{background:#2a2330;color:#ffd4a7}
   .b-rev{background:var(--rev);color:var(--rev-text)}
 
   .toolbar{display:flex;gap:8px;flex-wrap:wrap}
@@ -79,10 +105,10 @@
 <div class="sheet">
   <div class="card" role="region" aria-label="Cronix One-Page Panel">
     <header class="hdr">
-      <div class="title">Cronix Control Panel <span class="sub" id="lastRefresh">—</span></div>
+      <div class="title">Cronix Admin Panel <span class="sub" id="lastRefresh">—</span></div>
       <div class="row" style="margin-top:8px">
-        <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-unk">UNKNOWN</span></span>
-        <span class="pill">ngrok <span id="dot-n" class="dot"></span> <span id="n" class="badge b-unk">UNKNOWN</span></span>
+        <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-unk">FETCHING</span></span>
+        <span class="pill">ngrok <span id="dot-n" class="dot"></span> <span id="n" class="badge b-unk">FETCHING</span></span>
         <span class="pill right"><span id="msg" class="muted">Ready</span></span>
       </div>
     </header>
@@ -91,19 +117,19 @@
       <!-- QUICK CONTROLS -->
       <section class="section">
         <div class="toolbar">
-          <button data-act="/start" class="btn-primary">Start Cronix</button>
+          <button data-act="/start" class="btn-rgb">Start Cronix</button>
           <button data-act="/stop" data-confirm="Stop Cronix?">Stop Cronix</button>
-          <button data-act="/ngrok/start" class="btn-primary">Start ngrok</button>
+          <button data-act="/ngrok/start" class="btn-rgb">Start ngrok</button>
           <button data-act="/ngrok/stop" data-confirm="Stop ngrok?">Stop ngrok</button>
           <button data-act="/restart-all" data-confirm="Restart Cronix + ngrok now?">Restart All</button>
         </div>
-        <div class="help" style="margin-top:8px">Tip: If both show OFFLINE, hit <b>Restart All</b>.</div>
+        <div class="help" style="margin-top:8px"><b>Made by: Zenyical</b>.</div>
       </section>
 
       <!-- SETTINGS (inline, collapsible) -->
       <section class="section">
         <details>
-          <summary>Settings — API & Secret</summary>
+          <summary>Settings — API & Token (DONT TOUCH)</summary>
           <div class="details-body stack">
             <label>API Base URL
               <input id="apiInput" placeholder="https://your-ngrok-host.ngrok.app" />
@@ -124,9 +150,9 @@
       <section class="section" aria-label="Keys Manager">
         <h3 style="margin:0 0 8px">Keys</h3>
         <div class="row">
-          <input id="owner" placeholder="Owner name (e.g. user123)" />
+          <input id="owner" placeholder="Owner name (e.g. Timmy123)" />
           <input id="count" type="number" value="1" min="1" max="100" style="width:120px" />
-          <button id="btnGen" class="btn-primary">Generate Keys</button>
+          <button id="btnGen" class="btn-rgb">Generate Keys</button>
         </div>
         <div class="row" style="margin-top:8px">
           <input id="keyval" placeholder="Paste a key (lowercase)" style="flex:1" />
