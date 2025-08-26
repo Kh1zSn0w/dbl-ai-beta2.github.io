@@ -1,381 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
-  <title>Cronix FNM</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<!doctype html>
+<meta charset="utf-8">
+<title>Cronix Remote</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:system-ui;margin:24px;background:#0b0b0b;color:#eee}
+  .card{background:#151515;border:1px solid #222;border-radius:14px;padding:18px;margin-bottom:16px;max-width:520px}
+  button{background:#222;border:1px solid #444;color:#eee;padding:10px 14px;border-radius:10px;cursor:pointer}
+  button:hover{border-color:#777}
+  .badge{padding:6px 10px;border-radius:999px;font-weight:600;margin-left:6px}
+  .ok{background:#14351a;color:#65e077}.bad{background:#3a1414;color:#ff7777}
+</style>
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      color: white;
-      background: url('https://i.pinimg.com/736x/94/2c/38/942c38f36617241462213156ba1c6f96.jpg') center/cover no-repeat;
-      background-attachment: fixed;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .overlay {
-      padding: 30px 20px;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 500px;
-      backdrop-filter: blur(2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      background: rgba(0, 0, 0, 0.5);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 25px; /* vertical spacing between children */
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0; /* handled by gap */
-    }
-
-    p {
-      font-size: 1rem;
-      margin-bottom: 0; /* handled by gap */
-    }
-
-    .launch-btn {
-      background-color: #3E1A8A;
-      color: white;
-      padding: 10px 19px;
-      border: none;
-      border-radius: 20px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: 0.3s;
-      width: fit-content;
-      align-self: center;
-    }
-
-    .launch-btn:hover {
-      background-color: #6A0DAD;
-      transform: translateY(-2px);
-    }
-
-    .status {
-      font-weight: bold;
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-
-    .progress-container {
-      width: 100%;
-      height: 8px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(to right, #007bff, #00c6ff);
-      transition: width 0.4s ease-in-out;
-    }
-
-    .logbox {
-      background: rgba(0, 0, 0, 0.65);
-      border-radius: 15px;
-      padding: 15px;
-      font-size: 0.85rem;
-      text-align: left;
-      max-height: 180px;
-      height: 180px;       /* fixed height */
-      overflow-y: auto;    /* scroll if overflow */
-      white-space: pre-wrap;
-      margin-top: 0;
-      margin-bottom: 0;
-      line-height: 1.3rem; /* better line spacing */
-    }
-
-    .options {
-      background: rgba(0, 0, 0, 0.8);
-      padding: 15px;
-      border-radius: 15px;
-    }
-
-    .options h3 {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-
-    .option-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      font-size: 0.95rem;
-      gap: 10px;
-    }
-
-    .option-row label {
-      flex: 1;
-      text-align: left;
-    }
-
-    .option-row input[type="range"] {
-      flex: 1 1 55%;
-      margin-left: 10px;
-    }
-
-    .option-row .slider-value {
-      width: 30px;
-      text-align: left;
-      font-weight: 600;
-      margin-left: 10px;
-      flex-shrink: 0;
-    }
-
-    .option-row input[type="checkbox"] {
-      margin-left: 10px;
-      transform: scale(1.1);
-      flex-shrink: 0;
-    }
-
-    .discord-footer {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      margin-top: 0;
-    }
-
-    .discord-footer img {
-      width: 20px;
-      height: 20px;
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-
-      .logbox, .options {
-        font-size: 0.8rem;
-      }
-    }
-
-    /* Modal popup styles */
-    #modalOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    #modal {
-      background: #111;
-      border-radius: 15px;
-      padding: 25px 30px;
-      max-width: 350px;
-      text-align: center;
-      box-shadow: 0 0 15px #290f62;
-      color: white;
-    }
-
-    #modal p {
-      margin-bottom: 25px;
-      font-size: 1.1rem;
-    }
-
-    #modal button {
-      background: #290f62;
-      border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 10px 24px;
-      margin: 0 12px;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: background 0.3s;
-      min-width: 80px;
-    }
-
-    #modal button:hover {
-      background: #290f62;
-    }
-  </style>
-</head>
-<body>
-  <div class="overlay">
-    <h1>Flux (FNM)</h1>
-    <p>Fortnite Mobile Client Optimizer</p>
-    <a href="#" onclick="onLaunchClick(event)" class="launch-btn" id="launchBtn">Optimize</a>
-
-    <div class="status" id="statusText">Status: Ready</div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-
-    <div class="logbox" id="logBox"></div>
-
-    <div class="options">
-      <h3>Settings</h3>
-      <div class="option-row">
-        <label for="resolution">3D Resolution</label>
-        <input type="range" id="resolution" min="1" max="100" value="100" />
-        <div class="slider-value" id="resolutionValue">100%</div>
-      </div>
-      <div class="option-row">
-        <label for="aimAssist">Ray Tracing iPhone 15 Pro+</label>
-        <input type="checkbox" id="aimAssist" />
-      </div>
-      <div class="option-row">
-        <label for="forcePhysics">Force Physics</label>
-        <input type="checkbox" id="forcePhysics" />
-      </div>
-    </div>
-
-    <div class="discord-footer">
-      <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" alt="Discord" />
-      <a href="https://discord.gg/yourserver" target="_blank" style="color: white; text-decoration: none;">
-        Made by Zenyical — Discord
-      </a>
-    </div>
+<div class="card">
+  <h2 style="margin:0 0 10px">Cronix Remote</h2>
+  <div>cronix: <span id="c" class="badge bad">?</span> ngrok: <span id="n" class="badge bad">?</span></div>
+  <div style="margin-top:12px">
+    <button onclick="post('/start')">Start Cronix</button>
+    <button onclick="post('/stop')">Stop Cronix</button>
   </div>
-
-  <!-- Modal popup -->
-  <div id="modalOverlay">
-    <div id="modal">
-      <p>Warning: Enabling Ray Tracing may cause overheating. Continue?</p>
-      <button id="modalYes">Yes</button>
-      <button id="modalNo">No</button>
-    </div>
+  <div style="margin-top:12px">
+    <button onclick="post('/ngrok/start')">Start ngrok</button>
+    <button onclick="post('/ngrok/stop')">Stop ngrok</button>
   </div>
+  <div id="msg" style="margin-top:12px;opacity:.8"></div>
+</div>
 
-  <script>
-    const resolutionSlider = document.getElementById('resolution');
-    const resolutionValue = document.getElementById('resolutionValue');
-    const aimAssistCheckbox = document.getElementById('aimAssist');
-    const forcePhysicsCheckbox = document.getElementById('forcePhysics');
+<script>
+  const API = "https://7f007fe8f767.ngrok.app";         // control URL
+  const SECRET = "kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w";    // same as on server
 
-    const launchBtn = document.getElementById("launchBtn");
-    const logBox = document.getElementById("logBox");
-    const status = document.getElementById("statusText");
-    const progressBar = document.getElementById("progressBar");
-
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalYes = document.getElementById('modalYes');
-    const modalNo = document.getElementById('modalNo');
-
-    resolutionValue.textContent = resolutionSlider.value + '%';
-
-    resolutionSlider.addEventListener('input', () => {
-      resolutionValue.textContent = resolutionSlider.value + '%';
-    });
-
-    function log(msg) {
-      logBox.textContent += msg + "\n";
-      logBox.scrollTop = logBox.scrollHeight;
-    }
-
-    function updateProgressBar(pct) {
-      progressBar.style.width = pct + "%";
-    }
-
-    function lockUI(lock) {
-      resolutionSlider.disabled = lock;
-      aimAssistCheckbox.disabled = lock;
-      forcePhysicsCheckbox.disabled = lock;
-      launchBtn.disabled = lock;
-    }
-
-    function optimize() {
-      launchBtn.textContent = "Optimizing...";
-      logBox.textContent = "";
-      status.textContent = "Status: Initializing...";
-      updateProgressBar(0);
-      lockUI(true);
-
-      const baseDelay = 1500;
-      let delayMultiplier = 1.3;
-
-      if (aimAssistCheckbox.checked) delayMultiplier += 0.7;
-      if (forcePhysicsCheckbox.checked) delayMultiplier += 0.8;
-
-      const logs = [
-        `3D Resolution: ${resolutionSlider.value}%`,
-        aimAssistCheckbox.checked ? "Ray Tracing: On" : "Ray Tracing: Off",
-        `Force Physics: ${forcePhysicsCheckbox.checked ? "Enabled" : "Disabled"}`
-      ];
-
-      const steps = [
-        { pct: 5, text: "Loading settings...", log: logs[0], delay: baseDelay * delayMultiplier },
-        { pct: 15, text: "", log: logs[1], delay: baseDelay * 0.8 * delayMultiplier },
-        { pct: 25, text: "", log: logs[2], delay: baseDelay * delayMultiplier },
-        { pct: 45, text: "Initializing physics engine...", log: "Applying force calculations...", delay: baseDelay * 1.3 * delayMultiplier },
-        { pct: 65, text: "Optimizing graphics pipeline...", log: "Balancing GPU load...", delay: baseDelay * 1.3 * delayMultiplier },
-        { pct: 85, text: "Finalizing performance tweaks...", delay: baseDelay * delayMultiplier },
-        { pct: 100, text: "Success", log: "✅ Optimized.", delay: baseDelay * delayMultiplier },
-      ];
-
-      let i = 0;
-      function nextStep() {
-        if (i >= steps.length) {
-          launchBtn.textContent = "Optimize";
-          lockUI(false);
-          return;
-        }
-        updateProgressBar(steps[i].pct);
-        status.textContent = "Status: " + steps[i].text;
-        if (steps[i].log) log(steps[i].log);
-        setTimeout(() => {
-          i++;
-          nextStep();
-        }, steps[i].delay);
-      }
-      nextStep();
-    }
-
-    function onLaunchClick(event) {
-      event.preventDefault();  // prevent default anchor behavior
-      if (launchBtn.disabled) return; // do nothing if disabled
-      if (aimAssistCheckbox.checked) {
-        modalOverlay.style.display = "flex";
-      } else {
-        optimize();
-      }
-    }
-
-    modalYes.onclick = () => {
-      modalOverlay.style.display = "none";
-      optimize();
-    };
-
-    modalNo.onclick = () => {
-      modalOverlay.style.display = "none";
-      aimAssistCheckbox.checked = false;
-      log("Ray Tracing disabled by user.");
-      optimize();
-    };
-  </script>
-</body>
-</html>
+  async function post(path){
+    try{
+      const r = await fetch(API+path,{method:'POST',headers:{'X-Panel-Secret':SECRET}});
+      document.getElementById('msg').textContent = await r.text();
+      refresh();
+    }catch(e){ document.getElementById('msg').textContent = 'error: '+e; }
+  }
+  async function refresh(){
+    try{
+      const r = await fetch(API+'/status',{headers:{'X-Panel-Secret':SECRET}});
+      const j = await r.json();
+      badge('c', j.cronix); badge('n', j.ngrok);
+    }catch(e){ document.getElementById('msg').textContent = 'status error'; }
+  }
+  function badge(id, up){
+    const el = document.getElementById(id);
+    el.textContent = up ? 'ONLINE' : 'OFFLINE';
+    el.className = 'badge ' + (up ? 'ok' : 'bad');
+  }
+  refresh(); setInterval(refresh, 4000);
+</script>
