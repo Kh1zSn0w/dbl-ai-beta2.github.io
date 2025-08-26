@@ -1,52 +1,80 @@
 <!doctype html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Cronix Remote</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-  body{font-family:system-ui;margin:24px;background:#0b0b0b;color:#eee}
-  .card{background:#151515;border:1px solid #222;border-radius:14px;padding:18px;margin-bottom:16px;max-width:520px}
+  :root{color-scheme:dark light}
+  body{font-family:system-ui,Segoe UI,Arial;margin:24px;background:#0b0b0b;color:#eee}
+  .card{background:#151515;border:1px solid #222;border-radius:14px;padding:18px;margin:0 auto 16px;max-width:520px}
+  h2{margin:0 0 12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
   button{background:#222;border:1px solid #444;color:#eee;padding:10px 14px;border-radius:10px;cursor:pointer}
   button:hover{border-color:#777}
   .badge{padding:6px 10px;border-radius:999px;font-weight:600;margin-left:6px}
-  .ok{background:#14351a;color:#65e077}.bad{background:#3a1414;color:#ff7777}
+  .ok{background:#14351a;color:#65e077}.bad{background:#3a1414;color:#ff7777}.q{background:#433;color:#f99}
+  #msg{opacity:.85;margin-top:10px;min-height:1.25em}
 </style>
 
 <div class="card">
-  <h2 style="margin:0 0 10px">Cronix Remote</h2>
-  <div>cronix: <span id="c" class="badge bad">?</span> ngrok: <span id="n" class="badge bad">?</span></div>
-  <div style="margin-top:12px">
+  <h2>Cronix Remote</h2>
+  <div>
+    cronix: <span id="c" class="badge q">?</span>
+    ngrok: <span id="n" class="badge q">?</span>
+  </div>
+
+  <div class="row" style="margin-top:12px">
     <button onclick="post('/start')">Start Cronix</button>
     <button onclick="post('/stop')">Stop Cronix</button>
   </div>
-  <div style="margin-top:12px">
+
+  <div class="row" style="margin-top:12px">
     <button onclick="post('/ngrok/start')">Start ngrok</button>
     <button onclick="post('/ngrok/stop')">Stop ngrok</button>
+    <button onclick="post('/restart-all')">Restart All</button>
   </div>
-  <div id="msg" style="margin-top:12px;opacity:.8"></div>
+
+  <div id="msg"></div>
 </div>
 
 <script>
-  const API = "https://7f007fe8f767.ngrok.app";         // control URL
-  const SECRET = "kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w";    // same as on server
+  // === CONFIG (from your VM) ===
+  const API = "https://26c9662d1fae.ngrok.app";
+  const SECRET = "kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w";
 
-  async function post(path){
-    try{
-      const r = await fetch(API+path,{method:'POST',headers:{'X-Panel-Secret':SECRET}});
-      document.getElementById('msg').textContent = await r.text();
-      refresh();
-    }catch(e){ document.getElementById('msg').textContent = 'error: '+e; }
-  }
-  async function refresh(){
-    try{
-      const r = await fetch(API+'/status',{headers:{'X-Panel-Secret':SECRET}});
-      const j = await r.json();
-      badge('c', j.cronix); badge('n', j.ngrok);
-    }catch(e){ document.getElementById('msg').textContent = 'status error'; }
-  }
-  function badge(id, up){
+  const msg = (t) => (document.getElementById("msg").textContent = t ?? "");
+  const badge = (id, up) => {
     const el = document.getElementById(id);
-    el.textContent = up ? 'ONLINE' : 'OFFLINE';
-    el.className = 'badge ' + (up ? 'ok' : 'bad');
+    el.textContent = up ? "ONLINE" : "OFFLINE";
+    el.className = "badge " + (up ? "ok" : "bad");
+  };
+
+  async function post(path) {
+    msg("…");
+    try {
+      const r = await fetch(API + path, { method: "POST", headers: { "X-Panel-Secret": SECRET } });
+      msg(await r.text());
+      refresh();
+    } catch (e) {
+      msg("error: " + e);
+    }
   }
-  refresh(); setInterval(refresh, 4000);
+
+  async function refresh() {
+    try {
+      const r = await fetch(API + "/status", { headers: { "X-Panel-Secret": SECRET } });
+      const j = await r.json();
+      badge("c", !!j.cronix);
+      badge("n", !!j.ngrok);
+      msg("");
+    } catch (e) {
+      msg("status error");
+      document.getElementById("c").className = "badge q";
+      document.getElementById("n").className = "badge q";
+      document.getElementById("c").textContent = "?";
+      document.getElementById("n").textContent = "?";
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 4000);
 </script>
