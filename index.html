@@ -1,43 +1,58 @@
 <!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Cronix EARL</title>
+<title>Cronix Remote + Admin</title>
 <style>
   :root{color-scheme:dark light}
   body{font-family:system-ui,Segoe UI,Arial;margin:24px;background:#0b0b0b;color:#eee}
-  .card{background:#151515;border:1px solid #222;border-radius:14px;padding:18px;margin:0 auto 16px;max-width:520px}
+  .card{background:#151515;border:1px solid #222;border-radius:14px;padding:18px;margin:0 auto 16px;max-width:680px}
   h2{margin:0 0 12px}
   .row{display:flex;gap:10px;flex-wrap:wrap}
-  button{background:#222;border:1px solid #444;color:#eee;padding:10px 14px;border-radius:10px;cursor:pointer}
-  button:hover{border-color:#777}
+  input,button{background:#222;border:1px solid #444;color:#eee;padding:10px 12px;border-radius:10px}
+  button{cursor:pointer} button:hover{border-color:#777}
   .badge{padding:6px 10px;border-radius:999px;font-weight:600;margin-left:6px}
   .ok{background:#14351a;color:#65e077}.bad{background:#3a1414;color:#ff7777}.q{background:#433;color:#f99}
+  table{width:100%;border-collapse:collapse;margin-top:10px} th,td{padding:8px;border-bottom:1px solid #222}
   #msg{opacity:.85;margin-top:10px;min-height:1.25em}
 </style>
 
 <div class="card">
   <h2>Cronix Remote</h2>
-  <div>
-    cronix: <span id="c" class="badge q">?</span>
-    ngrok: <span id="n" class="badge q">?</span>
-  </div>
-
+  <div>cronix: <span id="c" class="badge q">?</span> ngrok: <span id="n" class="badge q">?</span></div>
   <div class="row" style="margin-top:12px">
     <button onclick="post('/start')">Start Cronix</button>
     <button onclick="post('/stop')">Stop Cronix</button>
-  </div>
-
-  <div class="row" style="margin-top:12px">
     <button onclick="post('/ngrok/start')">Start ngrok</button>
     <button onclick="post('/ngrok/stop')">Stop ngrok</button>
     <button onclick="post('/restart-all')">Restart All</button>
   </div>
-
   <div id="msg"></div>
 </div>
 
+<div class="card">
+  <h2>Admin — Keys</h2>
+  <div class="row">
+    <input id="owner" placeholder="owner (e.g. user123)" />
+    <input id="count" type="number" value="1" min="1" max="100" style="width:110px" />
+    <button onclick="gen()">Generate</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <input id="keyval" placeholder="key value (lowercase)" style="flex:1" />
+    <input id="newowner" placeholder="owner (for add)" style="width:210px" />
+    <button onclick="add()">Add Key</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <input id="target" placeholder="target key" style="flex:1" />
+    <button onclick="revoke()">Revoke</button>
+    <button onclick="unrevoke()">Unrevoke</button>
+    <button onclick="delkey()">Delete</button>
+    <button onclick="loadKeys()">Refresh List</button>
+  </div>
+  <div id="keys"></div>
+</div>
+
 <script>
-  // === CONFIG (from your VM) ===
+  // === CONFIG (update if your 8081 ngrok URL changes) ===
   const API = "https://26c9662d1fae.ngrok.app";
   const SECRET = "kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w";
 
@@ -48,34 +63,74 @@
     el.className = "badge " + (up ? "ok" : "bad");
   };
 
-  async function post(path) {
+  async function post(path, body) {
     msg("…");
     try {
-      const r = await fetch(API + path, { method: "POST", headers: { "X-Panel-Secret": SECRET } });
-      msg(await r.text());
-      refresh();
-    } catch (e) {
-      msg("error: " + e);
-    }
+      const r = await fetch(API + path, {
+        method: "POST",
+        headers: { "X-Panel-Secret": SECRET, "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const txt = await r.text();
+      msg(txt);
+      refresh(); if (path.startsWith("/keys")) loadKeys();
+    } catch (e) { msg("error: " + e); }
+  }
+
+  async function get(path) {
+    const r = await fetch(API + path, { headers: { "X-Panel-Secret": SECRET } });
+    return r.json();
   }
 
   async function refresh() {
     try {
-      const r = await fetch(API + "/status", { headers: { "X-Panel-Secret": SECRET } });
-      const j = await r.json();
-      badge("c", !!j.cronix);
-      badge("n", !!j.ngrok);
-      msg("");
-    } catch (e) {
-      msg("status error");
-      document.getElementById("c").className = "badge q";
-      document.getElementById("n").className = "badge q";
-      document.getElementById("c").textContent = "?";
-      document.getElementById("n").textContent = "?";
-    }
+      const j = await get("/status");
+      badge("c", !!j.cronix); badge("n", !!j.ngrok); msg("");
+    } catch { msg("status error"); }
   }
 
-  refresh();
-  setInterval(refresh, 4000);
-</script>
+  // ==== Keys UI ====
+  async function loadKeys() {
+    const box = document.getElementById("keys");
+    box.innerHTML = "loading…";
+    try {
+      const j = await get("/keys");
+      const rows = j.keys || [];
+      let html = "<table><tr><th>Key</th><th>Owner</th><th>Status</th></tr>";
+      for (const k of rows) {
+        html += `<tr><td style="font-family:monospace">${k.key}</td><td>${k.owner||""}</td><td>${k.status}</td></tr>`;
+      }
+      html += "</table>";
+      box.innerHTML = html;
+    } catch { box.textContent = "failed to load keys"; }
+  }
 
+  async function gen() {
+    const owner = document.getElementById("owner").value.trim() || "manual";
+    const n = parseInt(document.getElementById("count").value || "1");
+    await post("/keys/generate", { n, owner });
+  }
+  async function add() {
+    const key = document.getElementById("keyval").value.trim().toLowerCase();
+    const owner = document.getElementById("newowner").value.trim() || "manual";
+    if (!key) return msg("enter key");
+    await post("/keys/add", { key, owner });
+  }
+  async function revoke() {
+    const key = document.getElementById("target").value.trim().toLowerCase();
+    if (!key) return msg("enter key");
+    await post("/keys/revoke", { key });
+  }
+  async function unrevoke() {
+    const key = document.getElementById("target").value.trim().toLowerCase();
+    if (!key) return msg("enter key");
+    await post("/keys/unrevoke", { key });
+  }
+  async function delkey() {
+    const key = document.getElementById("target").value.trim().toLowerCase();
+    if (!key) return msg("enter key");
+    await post("/keys/delete", { key });
+  }
+
+  refresh(); loadKeys(); setInterval(refresh, 4000);
+</script>
