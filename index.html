@@ -1,136 +1,292 @@
 <!doctype html>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Cronix Remote + Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cronix — One‑Page Control Panel</title>
 <style>
-  :root{color-scheme:dark light}
-  body{font-family:system-ui,Segoe UI,Arial;margin:24px;background:#0b0b0b;color:#eee}
-  .card{background:#151515;border:1px solid #222;border-radius:14px;padding:18px;margin:0 auto 16px;max-width:680px}
-  h2{margin:0 0 12px}
+  :root{
+    color-scheme: dark light;
+    --bg:#0b0b0b; --card:#141414; --muted:#9aa0a6; --text:#eee;
+    --border:#242424; --border-strong:#2f2f2f; --accent:#7dd3fc;
+    --ok:#14351a; --ok-text:#65e077; --bad:#3a1414; --bad-text:#ff8a8a;
+    --rev:#2b1313; --rev-text:#ff6b6b; --btn:#1d1d1d; --btn-hover:#262626;
+    --shadow: 0 10px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, Segoe UI, Arial}
+
+  /* ONE PAGE SHEET */
+  .sheet{max-width:980px;margin:18px auto;padding:0 14px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+  .hdr{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(16,16,16,.95), rgba(16,16,16,.8));backdrop-filter: blur(6px);border-bottom:1px solid var(--border);padding:12px 14px;border-top-left-radius:16px;border-top-right-radius:16px}
+  .title{display:flex;align-items:center;gap:10px;font-weight:800}
+  .sub{color:var(--muted);font-size:12px}
+  .pill{border:1px solid var(--border-strong);padding:7px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#777}
+  .ok{background:#22c55e}.bad{background:#ef4444}
+
+  .body{padding:14px}
+  .section{padding:12px 0;border-bottom:1px dashed var(--border)}
+  .section:last-child{border-bottom:none}
   .row{display:flex;gap:10px;flex-wrap:wrap}
-  input,button{background:#222;border:1px solid #444;color:#eee;padding:10px 12px;border-radius:10px}
-  button{cursor:pointer} button:hover{border-color:#777}
-  .badge{padding:6px 10px;border-radius:999px;font-weight:600;margin-left:6px}
-  .ok{background:#14351a;color:#65e077}.bad{background:#3a1414;color:#ff7777}.q{background:#433;color:#f99}
-  table{width:100%;border-collapse:collapse;margin-top:10px} th,td{padding:8px;border-bottom:1px solid #222}
-  #msg{opacity:.85;margin-top:10px;min-height:1.25em}
+  .stack{display:flex;flex-direction:column;gap:10px}
+
+  input,button,select{background:var(--btn);border:1px solid var(--border-strong);color:var(--text);padding:10px 12px;border-radius:12px;min-height:44px}
+  button{cursor:pointer} button:hover{background:var(--btn-hover)}
+  .btn-primary{border-color:#3b82f6}
+  .btn-danger{border-color:#ef4444}
+  .btn-ghost{background:transparent}
+
+  .badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid var(--border-strong)}
+  .b-ok{background:var(--ok);color:var(--ok-text)}
+  .b-bad{background:var(--bad);color:var(--bad-text)}
+  .b-unk{background:#2a2330;color:#f7a7ff}
+  .b-rev{background:var(--rev);color:var(--rev-text)}
+
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  .muted{color:var(--muted)}
+  .help{font-size:12px;color:var(--muted)}
+
+  .table{width:100%;border-collapse:collapse;margin-top:10px}
+  .table th,.table td{padding:10px;border-bottom:1px solid var(--border)}
+  .table th{text-align:left;color:var(--muted);font-weight:600}
+  .key-row.rev{background:linear-gradient(0deg, rgba(255,77,77,0.08), rgba(255,77,77,0.08))}
+  .right{margin-left:auto}
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111;border:1px solid var(--border-strong);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s, bottom .2s;z-index:50}
+  .toast.show{opacity:1;pointer-events:auto;bottom:24px}
+
+  details{border:1px solid var(--border);border-radius:12px}
+  summary{cursor:pointer;list-style:none;padding:12px 14px}
+  summary::-webkit-details-marker{display:none}
+  .details-body{padding:14px;border-top:1px solid var(--border)}
+
+  /* Mobile niceties */
+  @media (max-width: 420px){
+    .toolbar button{flex:1 1 47%}
+    .row input, .row select{flex:1 1 47%}
+  }
 </style>
 
-<div class="card">
-  <h2>Cronix Remote</h2>
-  <div>cronix: <span id="c" class="badge q">?</span> ngrok: <span id="n" class="badge q">?</span></div>
-  <div class="row" style="margin-top:12px">
-    <button onclick="post('/start')">Start Cronix</button>
-    <button onclick="post('/stop')">Stop Cronix</button>
-    <button onclick="post('/ngrok/start')">Start ngrok</button>
-    <button onclick="post('/ngrok/stop')">Stop ngrok</button>
-    <button onclick="post('/restart-all')">Restart All</button>
+<div class="sheet">
+  <div class="card" role="region" aria-label="Cronix One‑Page Panel">
+    <header class="hdr">
+      <div class="title">Cronix Control Panel <span class="sub" id="lastRefresh">—</span></div>
+      <div class="row" style="margin-top:8px">
+        <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-unk">UNKNOWN</span></span>
+        <span class="pill">ngrok <span id="dot-n" class="dot"></span> <span id="n" class="badge b-unk">UNKNOWN</span></span>
+        <span class="pill right"><span id="msg" class="muted">Ready</span></span>
+      </div>
+    </header>
+
+    <div class="body">
+      <!-- QUICK CONTROLS -->
+      <section class="section">
+        <div class="toolbar">
+          <button data-act="/start" class="btn-primary">Start Cronix</button>
+          <button data-act="/stop">Stop Cronix</button>
+          <button data-act="/ngrok/start" class="btn-primary">Start ngrok</button>
+          <button data-act="/ngrok/stop">Stop ngrok</button>
+          <button data-act="/restart-all">Restart All</button>
+        </div>
+        <div class="help" style="margin-top:8px">Tip: If both show OFFLINE, hit <b>Restart All</b>.</div>
+      </section>
+
+      <!-- SETTINGS (inline, collapsible) -->
+      <section class="section">
+        <details>
+          <summary>Settings — API & Secret</summary>
+          <div class="details-body stack">
+            <label>API Base URL
+              <input id="apiInput" placeholder="https://your-ngrok-host.ngrok.app" />
+            </label>
+            <label>Panel Secret
+              <input id="secretInput" placeholder="••••••••" />
+            </label>
+            <div class="row">
+              <button id="saveCfg" class="btn-primary">Save</button>
+              <button id="resetCfg" class="btn-ghost">Reset to Default</button>
+              <span class="help">Saved only in this browser.</span>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- KEYS MANAGER (same page) -->
+      <section class="section" aria-label="Keys Manager">
+        <h3 style="margin:0 0 8px">Keys</h3>
+        <div class="row">
+          <input id="owner" placeholder="Owner name (e.g. user123)" />
+          <input id="count" type="number" value="1" min="1" max="100" style="width:120px" />
+          <button id="btnGen" class="btn-primary">Generate Keys</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <input id="keyval" placeholder="Paste a key (lowercase)" style="flex:1" />
+          <input id="newowner" placeholder="Owner for this key" style="width:220px" />
+          <button id="btnAdd">Add Key</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <input id="search" placeholder="Search key or owner…" style="flex:1" />
+          <select id="statusFilter" title="Filter">
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="revoked">Revoked</option>
+          </select>
+          <button id="btnRefresh">Refresh List</button>
+        </div>
+        <div class="help">Tap a key to copy. Red rows = revoked.</div>
+        <div id="keys" style="margin-top:8px">Loading…</div>
+      </section>
+    </div>
   </div>
-  <div id="msg"></div>
 </div>
 
-<div class="card">
-  <h2>Admin — Keys</h2>
-  <div class="row">
-    <input id="owner" placeholder="owner (e.g. user123)" />
-    <input id="count" type="number" value="1" min="1" max="100" style="width:110px" />
-    <button onclick="gen()">Generate</button>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <input id="keyval" placeholder="key value (lowercase)" style="flex:1" />
-    <input id="newowner" placeholder="owner (for add)" style="width:210px" />
-    <button onclick="add()">Add Key</button>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <input id="target" placeholder="target key" style="flex:1" />
-    <button onclick="revoke()">Revoke</button>
-    <button onclick="unrevoke()">Unrevoke</button>
-    <button onclick="delkey()">Delete</button>
-    <button onclick="loadKeys()">Refresh List</button>
-  </div>
-  <div id="keys"></div>
-</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-  // === CONFIG (update if your 8081 ngrok URL changes) ===
-  const API = "https://26c9662d1fae.ngrok.app";
-  const SECRET = "kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w";
-
-  const msg = (t) => (document.getElementById("msg").textContent = t ?? "");
-  const badge = (id, up) => {
-    const el = document.getElementById(id);
-    el.textContent = up ? "ONLINE" : "OFFLINE";
-    el.className = "badge " + (up ? "ok" : "bad");
+  // ===== Config (editable via Settings) =====
+  const DEFAULTS = {
+    API: "https://26c9662d1fae.ngrok.app",
+    SECRET: "kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w",
+  };
+  const store = {
+    get api(){return localStorage.getItem('cronix_api') || DEFAULTS.API},
+    set api(v){localStorage.setItem('cronix_api', v)},
+    get secret(){return localStorage.getItem('cronix_secret') || DEFAULTS.SECRET},
+    set secret(v){localStorage.setItem('cronix_secret', v)},
+    reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}
   };
 
-  async function post(path, body) {
-    msg("…");
-    try {
-      const r = await fetch(API + path, {
-        method: "POST",
-        headers: { "X-Panel-Secret": SECRET, "Content-Type": "application/json" },
-        body: body ? JSON.stringify(body) : undefined
-      });
-      const txt = await r.text();
-      msg(txt);
-      refresh(); if (path.startsWith("/keys")) loadKeys();
-    } catch (e) { msg("error: " + e); }
+  const els = {
+    msg: document.getElementById('msg'),
+    c: document.getElementById('c'),
+    n: document.getElementById('n'),
+    dotC: document.getElementById('dot-c'),
+    dotN: document.getElementById('dot-n'),
+    lastRefresh: document.getElementById('lastRefresh'),
+    toast: document.getElementById('toast'),
+    keysBox: document.getElementById('keys'),
+  };
+
+  function toast(text){
+    els.toast.textContent = text; els.toast.classList.add('show');
+    setTimeout(()=> els.toast.classList.remove('show'), 2000);
+  }
+  function setBadge(el, up){ el.textContent = up ? 'ONLINE' : 'OFFLINE'; el.className = 'badge ' + (up ? 'b-ok' : 'b-bad'); }
+  function setDot(el, up){ el.className = 'dot ' + (up ? 'ok' : 'bad'); }
+  function nowTime(){ return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+
+  async function apiFetch(path, opts={}){
+    const init = { method:'GET', headers:{'X-Panel-Secret': store.secret, 'Content-Type':'application/json'}, ...opts };
+    const r = await fetch(store.api + path, init);
+    if(!r.ok){ const t = await r.text().catch(()=> String(r.status)); throw new Error(`${r.status} ${t}`); }
+    const ct = r.headers.get('content-type') || ''; return ct.includes('application/json') ? r.json() : r.text();
   }
 
-  async function get(path) {
-    const r = await fetch(API + path, { headers: { "X-Panel-Secret": SECRET } });
-    return r.json();
+  async function doAction(path, body){
+    els.msg.textContent = 'Working…';
+    try{
+      const res = await apiFetch(path, {method:'POST', body: body ? JSON.stringify(body) : undefined});
+      els.msg.textContent = typeof res === 'string' ? res : 'Done'; toast('Success');
+      await refresh(); if(path.startsWith('/keys')) loadKeys();
+    }catch(e){ els.msg.textContent = `Error: ${e.message}`; toast('Failed'); }
   }
 
-  async function refresh() {
-    try {
-      const j = await get("/status");
-      badge("c", !!j.cronix); badge("n", !!j.ngrok); msg("");
-    } catch { msg("status error"); }
+  async function refresh(){
+    try{
+      const j = await apiFetch('/status');
+      setBadge(els.c, !!j.cronix); setDot(els.dotC, !!j.cronix);
+      setBadge(els.n, !!j.ngrok);  setDot(els.dotN, !!j.ngrok);
+      els.lastRefresh.textContent = 'Updated ' + nowTime();
+      els.msg.textContent='Ready';
+    }catch(e){
+      setBadge(els.c, false); setDot(els.dotC, false);
+      setBadge(els.n, false); setDot(els.dotN, false);
+      els.msg.textContent='Status error';
+    }
   }
 
-  // ==== Keys UI ====
-  async function loadKeys() {
-    const box = document.getElementById("keys");
-    box.innerHTML = "loading…";
-    try {
-      const j = await get("/keys");
-      const rows = j.keys || [];
-      let html = "<table><tr><th>Key</th><th>Owner</th><th>Status</th></tr>";
-      for (const k of rows) {
-        html += `<tr><td style="font-family:monospace">${k.key}</td><td>${k.owner||""}</td><td>${k.status}</td></tr>`;
-      }
-      html += "</table>";
-      box.innerHTML = html;
-    } catch { box.textContent = "failed to load keys"; }
+  // Button delegation (single page)
+  document.addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-act]'); if(b) doAction(b.dataset.act);
+  });
+
+  // Settings
+  const apiInput = document.getElementById('apiInput');
+  const secretInput = document.getElementById('secretInput');
+  const saveCfg = document.getElementById('saveCfg');
+  const resetCfg = document.getElementById('resetCfg');
+  apiInput.value = store.api; secretInput.value = store.secret;
+  saveCfg.onclick = ()=>{ store.api = apiInput.value.trim(); store.secret = secretInput.value.trim(); toast('Saved'); };
+  resetCfg.onclick = ()=>{ store.reset(); apiInput.value = store.api; secretInput.value = store.secret; toast('Reset'); };
+
+  // Keys
+  const ownerEl = document.getElementById('owner');
+  const countEl = document.getElementById('count');
+  const keyvalEl = document.getElementById('keyval');
+  const newownerEl = document.getElementById('newowner');
+  const searchEl = document.getElementById('search');
+  const statusFilterEl = document.getElementById('statusFilter');
+
+  document.getElementById('btnGen').onclick = async ()=>{
+    const owner = (ownerEl.value || 'manual').trim();
+    const n = Math.max(1, Math.min(100, parseInt(countEl.value || '1')));
+    await doAction('/keys/generate', { n, owner });
+  };
+  document.getElementById('btnAdd').onclick = async ()=>{
+    const key = (keyvalEl.value || '').trim().toLowerCase(); if(!key){ toast('Enter a key'); return; }
+    const owner = (newownerEl.value || 'manual').trim(); await doAction('/keys/add', { key, owner });
+  };
+  document.getElementById('btnRefresh').onclick = ()=> loadKeys();
+
+  let allKeys = [];
+  function renderKeys(){
+    const q = (searchEl.value||'').toLowerCase(); const filt = statusFilterEl.value;
+    const rows = allKeys.filter(k=>{
+      const text = `${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();
+      if(q && !text.includes(q)) return false;
+      const isRev = (k.status||'').toLowerCase().includes('revok');
+      if(filt==='active' && isRev) return false; if(filt==='revoked' && !isRev) return false; return true;
+    });
+
+    let html = `<table class="table" role="table"><thead><tr><th>Key</th><th>Owner</th><th>Status</th><th class="right">Actions</th></tr></thead><tbody>`;
+    for(const k of rows){
+      const rev = (k.status||'').toLowerCase().includes('revok');
+      html += `<tr class="key-row ${rev?'rev':''}">
+        <td style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace;word-break:break-all" data-copy="${k.key}">${k.key}</td>
+        <td>${k.owner||''}</td>
+        <td>${rev?'<span class="badge b-rev">REVOKED</span>':'<span class="badge b-ok">ACTIVE</span>'}</td>
+        <td class="right">
+          ${rev?`<button class="btn-primary" data-row-unrevoke="${k.key}">Unrevoke</button>`:`<button class="btn-danger" data-row-revoke="${k.key}">Revoke</button>`}
+          <button class="btn-ghost" data-row-del="${k.key}">Delete</button>
+        </td>
+      </tr>`
+    }
+    html += `</tbody></table>`;
+    els.keysBox.innerHTML = html;
   }
 
-  async function gen() {
-    const owner = document.getElementById("owner").value.trim() || "manual";
-    const n = parseInt(document.getElementById("count").value || "1");
-    await post("/keys/generate", { n, owner });
-  }
-  async function add() {
-    const key = document.getElementById("keyval").value.trim().toLowerCase();
-    const owner = document.getElementById("newowner").value.trim() || "manual";
-    if (!key) return msg("enter key");
-    await post("/keys/add", { key, owner });
-  }
-  async function revoke() {
-    const key = document.getElementById("target").value.trim().toLowerCase();
-    if (!key) return msg("enter key");
-    await post("/keys/revoke", { key });
-  }
-  async function unrevoke() {
-    const key = document.getElementById("target").value.trim().toLowerCase();
-    if (!key) return msg("enter key");
-    await post("/keys/unrevoke", { key });
-  }
-  async function delkey() {
-    const key = document.getElementById("target").value.trim().toLowerCase();
-    if (!key) return msg("enter key");
-    await post("/keys/delete", { key });
+  els.keysBox.addEventListener('click', async (e)=>{
+    const t = e.target;
+    const revoke = t.closest('[data-row-revoke]');
+    const unrevoke = t.closest('[data-row-unrevoke]');
+    const del = t.closest('[data-row-del]');
+    const copy = t.closest('[data-copy]');
+    if(revoke){ await doAction('/keys/revoke', { key: revoke.dataset.rowRevoke }); return; }
+    if(unrevoke){ await doAction('/keys/unrevoke', { key: unrevoke.dataset.rowUnrevoke }); return; }
+    if(del){ if(confirm('Delete this key?')) await doAction('/keys/delete', { key: del.dataset.rowDel }); return; }
+    if(copy){ try{ await navigator.clipboard.writeText(copy.dataset.copy); toast('Key copied'); }catch{ toast('Copy failed'); } }
+  });
+
+  async function loadKeys(){
+    els.keysBox.textContent = 'Loading…';
+    try{ const j = await apiFetch('/keys'); allKeys = j.keys||[]; renderKeys(); }
+    catch{ els.keysBox.textContent = 'Failed to load keys'; }
   }
 
+  searchEl?.addEventListener('input', renderKeys);
+  statusFilterEl?.addEventListener('change', renderKeys);
+
+  // Init
   refresh(); loadKeys(); setInterval(refresh, 4000);
 </script>
