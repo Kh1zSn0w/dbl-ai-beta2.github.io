@@ -3,179 +3,104 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Cronix Admin Panel</title>
 <style>
-  :root{
-    color-scheme: dark light;
-    --bg:#0b0b0b; --card:#141414; --muted:#9aa0a6; --text:#eee;
-    --border:#242424; --border-strong:#2f2f2f; --accent:#7dd3fc;
-    --ok:#14351a; --ok-text:#65e077; --bad:#3a1414; --bad-text:#ff8a8a;
-    --rev:#2b1313; --rev-text:#ff6b6b; --btn:#1d1d1d; --btn-hover:#262626;
-    --shadow: 0 10px 24px rgba(0,0,0,.35);
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, Segoe UI, Arial}
-
+  :root{color-scheme:dark light;--bg:#0b0b0b;--card:#141414;--muted:#9aa0a6;--text:#eee;--border:#242424;--border-strong:#2f2f2f;--accent:#ff2424;--ok:#14351a;--ok-text:#65e077;--bad:#3a1414;--bad-text:#ff8a8a;--btn:#1d1d1d;--btn-hover:#262626;--shadow:0 10px 24px rgba(0,0,0,.35)}
+  *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, Segoe UI, Arial}
   .sheet{max-width:980px;margin:18px auto;padding:0 14px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
-  .hdr{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(16,16,16,.95), rgba(16,16,16,.8));backdrop-filter: blur(6px);border-bottom:1px solid var(--border);padding:12px 14px;border-top-left-radius:16px;border-top-right-radius:16px}
-  .title{display:flex;align-items:center;gap:10px;font-weight:800}
-  .sub{color:var(--muted);font-size:12px}
+  .hdr{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(16,16,16,.95),rgba(16,16,16,.8));backdrop-filter:blur(6px);border-bottom:1px solid var(--border);padding:12px 14px;border-top-left-radius:16px;border-top-right-radius:16px}
+  .title{display:flex;align-items:center;gap:10px;font-weight:800}.sub{color:var(--muted);font-size:12px}
   .pill{border:1px solid var(--border-strong);padding:7px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:8px}
-  .dot{width:8px;height:8px;border-radius:50%;background:#777}
-  .ok{background:#22c55e}.bad{background:#ef4444}
-
-  .body{padding:14px}
-  .section{padding:12px 0;border-bottom:1px dashed var(--border)}
-  .section:last-child{border-bottom:none}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  .stack{display:flex;flex-direction:column;gap:10px}
-
+  .dot{width:8px;height:8px;border-radius:50%}.ok{background:#22c55e}.bad{background:#ef4444}.muted{color:var(--muted)}
+  .body{padding:14px}.section{padding:12px 0;border-bottom:1px dashed var(--border)} .section:last-child{border-bottom:none}
+  .row{display:flex;gap:10px;flex-wrap:wrap}.stack{display:flex;flex-direction:column;gap:10px}
   input,button,select{background:var(--btn);border:1px solid var(--border-strong);color:var(--text);padding:10px 12px;border-radius:12px;min-height:44px}
-  button{cursor:pointer} button:hover{background:var(--btn-hover)}
-  .btn-primary{border-color:#3b82f6}
-  .btn-danger{border-color:#ef4444}
-  .btn-ghost{background:transparent}
-
-  /* ======= RGB rim buttons (Cronix/Ngrok/Generate) ======= */
-  @property --a{syntax:"<angle>"; inherits:false; initial-value:0deg;}
-  @keyframes spin { to { --a: 360deg; } }
-  .btn-rgb{
-    --border-w:2px;
-    position:relative;
-    border:var(--border-w) solid transparent;
-    border-radius:12px;
-    padding:10px 12px;
-    color:var(--text);
-    background:
-      /* inner fill */
-      linear-gradient(var(--btn),var(--btn)) padding-box,
-      /* animated rim */
-      conic-gradient(from var(--a),
-        #ff0000, #ffa500, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
-      ) border-box;
-    animation: spin 6s linear infinite;
-  }
-  .btn-rgb:hover{background:
-      linear-gradient(var(--btn-hover),var(--btn-hover)) padding-box,
-      conic-gradient(from var(--a),
-        #ff0000, #ffa500, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
-      ) border-box;}
-  /* ======================================================= */
-
-  .badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid var(--border-strong)}
-  .b-ok{background:var(--ok);color:var(--ok-text)}
-  .b-bad{background:var(--bad);color:var(--bad-text)}
-  .b-unk{background:#2a2330;color:#ffd4a7}
-  .b-rev{background:var(--rev);color:var(--rev-text)}
-
+  button{cursor:pointer}button:hover{background:var(--btn-hover)}.btn-danger{border-color:#ff0000}.btn-ghost{background:transparent}
+  @property --a{syntax:"<angle>";inherits:false;initial-value:0deg}@keyframes spin{to{--a:360deg}}
+  .btn-rim{--border-w:2px;position:relative;border:var(--border-w) solid transparent;border-radius:12px;color:var(--text);background:linear-gradient(var(--btn),var(--btn)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 4s linear infinite}
+  .btn-rim:hover{background:linear-gradient(var(--btn-hover),var(--btn-hover)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box}
+  .card-rim{--r:16px;position:relative;border-radius:var(--r);background:linear-gradient(var(--card),var(--card)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 8s linear infinite;border:2px solid transparent}
+  .card-rim .hdr{border-top-left-radius:16px;border-top-right-radius:16px}
+  .rim-focus:focus{border-color:transparent;background:linear-gradient(var(--btn),var(--btn)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 6s linear infinite}
+  .badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid var(--border-strong)}.b-ok{background:#14351a;color:var(--ok-text)}.b-bad{background:#3a1414;color:var(--bad-text)}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-  .muted{color:var(--muted)}
-  .help{font-size:12px;color:var(--muted)}
-
-  .table{width:100%;border-collapse:collapse;margin-top:10px}
-  .table th,.table td{padding:10px;border-bottom:1px solid var(--border)}
-  .table th{text-align:left;color:var(--muted);font-weight:600}
-  .key-row.rev{background:linear-gradient(0deg, rgba(255,77,77,0.08), rgba(255,77,77,0.08))}
-  .right{margin-left:auto}
-
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111;border:1px solid var(--border-strong);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s, bottom .2s;z-index:50}
+  .table{width:100%;border-collapse:collapse;margin-top:10px}.table th,.table td{padding:10px;border-bottom:1px solid var(--border)}.table th{text-align:left;color:var(--muted);font-weight:600}
+  .key-row.rev{background:linear-gradient(0deg,rgba(255,77,77,.08),rgba(255,77,77,.08))}.right{margin-left:auto}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111;border:1px solid var(--border-strong);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,bottom .2s;z-index:50}
   .toast.show{opacity:1;pointer-events:auto;bottom:24px}
-
-  details{border:1px solid var(--border);border-radius:12px}
-  summary{cursor:pointer;list-style:none;padding:12px 14px}
-  summary::-webkit-details-marker{display:none}
-  .details-body{padding:14px;border-top:1px solid var(--border)}
-
-  /* Modal */
   .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:60;padding:16px}
   .modal{max-width:560px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
   .modal header{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:800}
   .modal .content{padding:14px 16px}
   .modal footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-  .modal .klist{display:flex;flex-direction:column;gap:8px}
-  .modal .kitem{display:flex;gap:8px;align-items:center}
-  .modal .kkey{flex:1;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;word-break:break-all;border:1px dashed var(--border);border-radius:10px;padding:8px 10px}
-
-  @media (max-width: 420px){
-    .toolbar button{flex:1 1 47%}
-    .row input, .row select{flex:1 1 47%}
-  }
+  .modal .klist{display:flex;flex-direction:column;gap:8px}.modal .kitem{display:flex;gap:8px;align-items:center}
+  .modal .kkey{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;border:1px dashed var(--border);border-radius:10px;padding:8px 10px}
+  .btn-rim-small{--border-w:2px;border-radius:10px;border:var(--border-w) solid transparent;background:linear-gradient(var(--btn),var(--btn)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 4s linear infinite;padding:8px 12px;color:var(--text)}
+  @media (max-width:420px){.toolbar button{flex:1 1 47%}.row input,.row select{flex:1 1 47%}}
 </style>
 
 <div class="sheet">
-  <div class="card" role="region" aria-label="Cronix One-Page Panel">
+  <div class="card card-rim" role="region" aria-label="Cronix One-Page Panel">
     <header class="hdr">
       <div class="title">Cronix Admin Panel <span class="sub" id="lastRefresh">—</span></div>
       <div class="row" style="margin-top:8px">
-        <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-unk">FETCHING</span></span>
-        <span class="pill">ngrok <span id="dot-n" class="dot"></span> <span id="n" class="badge b-unk">FETCHING</span></span>
+        <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-bad">OFFLINE</span></span>
         <span class="pill right"><span id="msg" class="muted">Ready</span></span>
       </div>
     </header>
-
     <div class="body">
-      <!-- QUICK CONTROLS -->
       <section class="section">
         <div class="toolbar">
-          <button data-act="/start" class="btn-rgb">Start Cronix</button>
-          <button data-act="/stop" data-confirm="Stop Cronix?">Stop Cronix</button>
-          <button data-act="/ngrok/start" class="btn-rgb">Start ngrok</button>
-          <button data-act="/ngrok/stop" data-confirm="Stop ngrok?">Stop ngrok</button>
-          <button data-act="/restart-all" data-confirm="Restart Cronix + ngrok now?">Restart All</button>
+          <button data-act="/start" class="btn-rim">Start Cronix</button>
+          <button data-act="/stop" class="btn-danger" data-confirm="Stop Cronix?">Stop Cronix</button>
         </div>
-        <div class="help" style="margin-top:8px"><b>Made by: Zenyical</b>.</div>
+        <div class="muted" style="margin-top:8px"><b>Made by: Zenyical</b>.</div>
       </section>
-
-      <!-- SETTINGS (inline, collapsible) -->
       <section class="section">
         <details>
           <summary>Settings — API & Token (DONT TOUCH)</summary>
           <div class="details-body stack">
             <label>API Base URL
-              <input id="apiInput" placeholder="https://your-ngrok-host.ngrok.app" />
+              <input id="apiInput" class="rim-focus" placeholder="https://your-ngrok-host.ngrok.app" />
             </label>
             <label>Panel Secret
-              <input id="secretInput" placeholder="••••••••" />
+              <input id="secretInput" class="rim-focus" placeholder="••••••••" />
             </label>
             <div class="row">
-              <button id="saveCfg" class="btn-primary">Save</button>
+              <button id="saveCfg" class="btn-rim">Save</button>
               <button id="resetCfg" class="btn-ghost">Reset to Default</button>
-              <span class="help">Saved only in this browser.</span>
+              <span class="muted">Saved only in this browser.</span>
             </div>
           </div>
         </details>
       </section>
-
-      <!-- KEYS MANAGER -->
       <section class="section" aria-label="Keys Manager">
         <h3 style="margin:0 0 8px">Keys</h3>
         <div class="row">
-          <input id="owner" placeholder="Owner name (e.g. Timmy123)" />
-          <input id="count" type="number" value="1" min="1" max="100" style="width:120px" />
-          <button id="btnGen" class="btn-rgb">Generate Keys</button>
+          <input id="owner" class="rim-focus" placeholder="Owner name (e.g. Timmy123)" />
+          <input id="count" class="rim-focus" type="number" value="1" min="1" max="100" style="width:120px" />
+          <button id="btnGen" class="btn-rim">Generate Keys</button>
         </div>
         <div class="row" style="margin-top:8px">
-          <input id="keyval" placeholder="Paste a key (lowercase)" style="flex:1" />
-          <input id="newowner" placeholder="Owner for this key" style="width:220px" />
-          <button id="btnAdd">Add Key</button>
+          <input id="keyval" class="rim-focus" placeholder="Paste a key (lowercase)" style="flex:1" />
+          <input id="newowner" class="rim-focus" placeholder="Owner for this key" style="width:220px" />
+          <button id="btnAdd" class="btn-rim">Add Key</button>
         </div>
         <div class="row" style="margin-top:8px">
-          <input id="search" placeholder="Search key or owner…" style="flex:1" />
-          <select id="statusFilter" title="Filter">
+          <input id="search" class="rim-focus" placeholder="Search key or owner…" style="flex:1" />
+          <select id="statusFilter" class="rim-focus" title="Filter">
             <option value="all">All</option>
             <option value="active">Active</option>
             <option value="revoked">Revoked</option>
           </select>
-          <button id="btnRefresh">Refresh List</button>
+          <button id="btnRefresh" class="btn-rim">Refresh List</button>
         </div>
-        <div class="help">Tap a key to copy. Red rows = revoked.</div>
+        <div class="muted">Tap a key to copy. Red rows = revoked.</div>
         <div id="keys" style="margin-top:8px">Loading…</div>
       </section>
     </div>
   </div>
 </div>
 
-<!-- Modal Root -->
 <div id="modalRoot" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal" role="document" aria-labelledby="mTitle" aria-describedby="mContent">
     <header id="mTitle">Dialog</header>
@@ -183,249 +108,44 @@
     <footer id="mFooter"></footer>
   </div>
 </div>
-
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-  // ===== Config =====
-  const DEFAULTS = {
-    API: "https://26c9662d1fae.ngrok.app",
-    SECRET: "kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w",
-  };
-  const store = {
-    get api(){return localStorage.getItem('cronix_api') || DEFAULTS.API},
-    set api(v){localStorage.setItem('cronix_api', v)},
-    get secret(){return localStorage.getItem('cronix_secret') || DEFAULTS.SECRET},
-    set secret(v){localStorage.setItem('cronix_secret', v)},
-    reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}
-  };
+  const DEFAULTS={API:"https://ce5a098c2a60.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
+  const store={get api(){return localStorage.getItem('cronix_api')||DEFAULTS.API},set api(v){localStorage.setItem('cronix_api',v)},get secret(){return localStorage.getItem('cronix_secret')||DEFAULTS.SECRET},set secret(v){localStorage.setItem('cronix_secret',v)},reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}};
+  const els={msg:document.getElementById('msg'),c:document.getElementById('c'),dotC:document.getElementById('dot-c'),lastRefresh:document.getElementById('lastRefresh'),toast:document.getElementById('toast'),keysBox:document.getElementById('keys'),modalRoot:document.getElementById('modalRoot'),mTitle:document.getElementById('mTitle'),mContent:document.getElementById('mContent'),mFooter:document.getElementById('mFooter')};
 
-  const els = {
-    msg: document.getElementById('msg'),
-    c: document.getElementById('c'),
-    n: document.getElementById('n'),
-    dotC: document.getElementById('dot-c'),
-    dotN: document.getElementById('dot-n'),
-    lastRefresh: document.getElementById('lastRefresh'),
-    toast: document.getElementById('toast'),
-    keysBox: document.getElementById('keys'),
-    modalRoot: document.getElementById('modalRoot'),
-    mTitle: document.getElementById('mTitle'),
-    mContent: document.getElementById('mContent'),
-    mFooter: document.getElementById('mFooter'),
-  };
+  function toast(t){els.toast.textContent=t;els.toast.classList.add('show');setTimeout(()=>els.toast.classList.remove('show'),2000)}
+  function openModal({title='Dialog',html='',buttons=[{id:'ok',label:'OK'}]}){els.mTitle.textContent=title;els.mContent.innerHTML=html;els.mFooter.innerHTML='';buttons.forEach(b=>{const x=document.createElement('button');x.textContent=b.label;x.className=(b.variant||'btn-rim-small');x.dataset.id=b.id;els.mFooter.appendChild(x)});els.modalRoot.style.display='flex';els.modalRoot.setAttribute('aria-hidden','false');return new Promise(res=>{const onClick=e=>{const t=e.target.closest('button');if(!t)return;cleanup();closeModal();res(t.dataset.id)};const onEsc=e=>{if(e.key==='Escape'){cleanup();closeModal();res('esc')}};const onBack=e=>{if(e.target===els.modalRoot){cleanup();closeModal();res('backdrop')}};function cleanup(){els.mFooter.removeEventListener('click',onClick);window.removeEventListener('keydown',onEsc);els.modalRoot.removeEventListener('click',onBack)};els.mFooter.addEventListener('click',onClick);window.addEventListener('keydown',onEsc);els.modalRoot.addEventListener('click',onBack)})}
+  function closeModal(){els.modalRoot.style.display='none';els.modalRoot.setAttribute('aria-hidden','true')}
+  async function confirmDialog(msg,sub=''){const html=`<div class="stack"><div>${msg}</div>${sub?`<div class="muted">${sub}</div>`:''}</div>`;const id=await openModal({title:'Please confirm',html,buttons:[{id:'cancel',label:'Cancel',variant:'btn-ghost'},{id:'ok',label:'Confirm'}]});return id==='ok'}
+  function keysPopup(owner,keys){const list=keys.map(k=>`<div class="kitem"><span class="kkey" data-copy="${k}">${k}</span><button class="btn-rim-small" data-copybtn="${k}">Copy</button></div>`).join('');const html=`<div class="stack"><div><b>Owner:</b> ${owner}</div><div class="klist">${list}</div></div>`;openModal({title:'Keys generated',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});const h=async e=>{const cell=e.target.closest('[data-copy]');const btn=e.target.closest('[data-copybtn]');const val=cell?.dataset.copy||btn?.dataset.copybtn;if(val){try{await navigator.clipboard.writeText(val);toast('Copied')}catch{toast('Copy failed')}}};els.mContent.addEventListener('click',h,{once:true})}
+  function keyAddedPopup(owner,key){const html=`<div class="stack"><div><b>Owner:</b> ${owner}</div><div class="kitem"><span class="kkey" data-copy="${key}">${key}</span><button class="btn-rim-small" data-copybtn="${key}">Copy</button></div></div>`;openModal({title:'Key added',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});const h=async e=>{const cell=e.target.closest('[data-copy]');const btn=e.target.closest('[data-copybtn]');const val=cell?.dataset.copy||btn?.dataset.copybtn;if(val){try{await navigator.clipboard.writeText(val);toast('Copied')}catch{toast('Copy failed')}}};els.mContent.addEventListener('click',h,{once:true})}
 
-  // ===== Modal helpers =====
-  function openModal({title='Dialog', html='', buttons=[{id:'ok',label:'OK',variant:'btn-primary'}]}){
-    els.mTitle.textContent = title;
-    els.mContent.innerHTML = html;
-    els.mFooter.innerHTML = '';
-    buttons.forEach(b=>{
-      const btn = document.createElement('button');
-      btn.textContent = b.label; btn.className = b.variant || ''; btn.dataset.id = b.id;
-      els.mFooter.appendChild(btn);
-    });
-    els.modalRoot.style.display = 'flex';
-    els.modalRoot.setAttribute('aria-hidden','false');
-    return new Promise(resolve=>{
-      function onClick(e){
-        const t = e.target.closest('button'); if(!t) return;
-        const id = t.dataset.id; closeModal(); resolve(id);
-      }
-      function onEsc(e){ if(e.key==='Escape'){ closeModal(); resolve('esc'); } }
-      els.mFooter.addEventListener('click', onClick, {once:true});
-      window.addEventListener('keydown', onEsc, {once:true});
-      els.modalRoot.addEventListener('click', (ev)=>{ if(ev.target===els.modalRoot){ closeModal(); resolve('backdrop'); }}, {once:true});
-    });
-  }
-  function closeModal(){ els.modalRoot.style.display = 'none'; els.modalRoot.setAttribute('aria-hidden','true'); }
+  function setBadge(el,up){el.textContent=up?'ONLINE':'OFFLINE';el.className='badge '+(up?'b-ok':'b-bad')}
+  function setDot(el,up){el.className='dot '+(up?'ok':'bad')}
+  const apiBase=()=> (store.api||'').replace(/\/+$/,'')
 
-  async function confirmDialog(msg, sub=''){
-    const html = `<div class="stack"><div>${msg}</div>${sub?`<div class="muted">${sub}</div>`:''}</div>`;
-    const id = await openModal({title:'Please confirm', html, buttons:[{id:'cancel',label:'Cancel'},{id:'ok',label:'Confirm',variant:'btn-primary'}]});
-    return id==='ok';
-  }
+  async function apiFetch(path,opts={}){const init={method:'GET',headers:{'X-Panel-Secret':store.secret,'Content-Type':'application/json'},...opts};const url=apiBase()+path;const r=await fetch(url,init);if(!r.ok){const t=await r.text().catch(()=>String(r.status));throw new Error(`${r.status} ${t.slice(0,200)}`)}const ct=r.headers.get('content-type')||'';return ct.includes('application/json')?r.json():r.text()}
+  async function doAction(path,body){els.msg.textContent='Working…';try{const res=await apiFetch(path,{method:'POST',body:body?JSON.stringify(body):undefined});els.msg.textContent=typeof res==='string'?res:'Done';toast('Success');await refresh();if(path.startsWith('/keys'))loadKeys();return res}catch(e){els.msg.textContent=`Error: ${e.message}`;toast('Failed');throw e}}
+  async function refresh(){try{const j=await apiFetch('/status');setBadge(els.c,!!j.cronix);setDot(els.dotC,!!j.cronix);els.lastRefresh.textContent='Updated '+new Date().toLocaleTimeString();els.msg.textContent='Ready'}catch(e){setBadge(els.c,false);setDot(els.dotC,false);els.msg.textContent='Status error'}}
 
-  function keysPopup(owner, keys){
-    const list = keys.map(k=>`
-      <div class="kitem">
-        <span class="kkey" data-copy="${k}">${k}</span>
-        <button data-copybtn="${k}">Copy</button>
-      </div>`).join('');
-    const html = `<div class="stack">
-      <div><b>Owner:</b> ${owner}</div>
-      <div class="klist">${list}</div>
-    </div>`;
-    openModal({title:'Keys generated', html, buttons:[{id:'close',label:'Close'}]}).then(()=>{});
-    const clickHandler = async (e)=>{
-      const cell = e.target.closest('[data-copy]');
-      const btn = e.target.closest('[data-copybtn]');
-      const val = cell?.dataset.copy || btn?.dataset.copybtn;
-      if(val){ try{ await navigator.clipboard.writeText(val); toast('Copied'); }catch{ toast('Copy failed'); } }
-    };
-    els.mContent.addEventListener('click', clickHandler, {once:true});
-  }
+  document.addEventListener('click',async e=>{const b=e.target.closest('button[data-act]');if(!b)return;const path=b.dataset.act;if(b.dataset.confirm){const ok=await confirmDialog(b.dataset.confirm);if(!ok)return}doAction(path)})
 
-  // ===== Toast =====
-  function toast(text){
-    els.toast.textContent = text; els.toast.classList.add('show');
-    setTimeout(()=> els.toast.classList.remove('show'), 2000);
-  }
-  function setBadge(el, up){ el.textContent = up ? 'ONLINE' : 'OFFLINE'; el.className = 'badge ' + (up ? 'b-ok' : 'b-bad'); }
-  function setDot(el, up){ el.className = 'dot ' + (up ? 'ok' : 'bad'); }
-  function nowTime(){ return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+  const apiInput=document.getElementById('apiInput');const secretInput=document.getElementById('secretInput');const saveCfg=document.getElementById('saveCfg');const resetCfg=document.getElementById('resetCfg');apiInput.value=store.api;secretInput.value=store.secret;saveCfg.onclick=()=>{store.api=apiInput.value.trim().replace(/\/+$/,'');store.secret=secretInput.value.trim();toast('Saved')};resetCfg.onclick=()=>{store.reset();apiInput.value=store.api;secretInput.value=store.secret;toast('Reset')}
 
-  // ===== API =====
-  async function apiFetch(path, opts={}){
-    const init = { method:'GET', headers:{'X-Panel-Secret': store.secret, 'Content-Type':'application/json'}, ...opts };
-    const r = await fetch(store.api + path, init);
-    if(!r.ok){ const t = await r.text().catch(()=> String(r.status)); throw new Error(`${r.status} ${t}`); }
-    const ct = r.headers.get('content-type') || ''; return ct.includes('application/json') ? r.json() : r.text();
-  }
+  const ownerEl=document.getElementById('owner');const countEl=document.getElementById('count');const keyvalEl=document.getElementById('keyval');const newownerEl=document.getElementById('newowner');const searchEl=document.getElementById('search');const statusFilterEl=document.getElementById('statusFilter');
 
-  async function doAction(path, body){
-    els.msg.textContent = 'Working…';
-    try{
-      const res = await apiFetch(path, {method:'POST', body: body ? JSON.stringify(body) : undefined});
-      els.msg.textContent = typeof res === 'string' ? res : 'Done'; toast('Success');
-      await refresh(); if(path.startsWith('/keys')) loadKeys();
-      return res;
-    }catch(e){ els.msg.textContent = `Error: ${e.message}`; toast('Failed'); throw e; }
-  }
+  async function loadKeys(){els.keysBox.textContent='Loading…';try{const j=await apiFetch('/keys');allKeys=j.keys||[];renderKeys()}catch{els.keysBox.textContent='Failed to load keys'}}
+  let allKeys=[]
+  function renderKeys(){const q=(searchEl.value||'').toLowerCase();const filt=statusFilterEl.value;const rows=allKeys.filter(k=>{const text=`${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();if(q&&!text.includes(q))return false;const rev=(k.status||'').toLowerCase().includes('revok');if(filt==='active'&&rev)return false;if(filt==='revoked'&&!rev)return false;return true}).map(k=>`<tr class="key-row ${(k.status||'').toLowerCase().includes('revok')?'rev':''}"><td style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all" data-copy="${k.key}">${k.key}</td><td>${k.owner||''}</td><td>${(k.status||'').toLowerCase().includes('revok')?'<span class="badge b-bad">REVOKED</span>':'<span class="badge b-ok">ACTIVE</span>'}</td><td class="right">${(k.status||'').toLowerCase().includes('revok')?`<button class="btn-rim-small" data-row-unrevoke="${k.key}">Unrevoke</button>`:`<button class="btn-danger" data-row-revoke="${k.key}">Revoke</button>`}<button class="btn-ghost" data-row-del="${k.key}">Delete</button></td></tr>`).join('');els.keysBox.innerHTML=`<table class="table"><thead><tr><th>Key</th><th>Owner</th><th>Status</th><th class="right">Actions</th></tr></thead><tbody>${rows}</tbody></table>`}
 
-  async function refresh(){
-    try{
-      const j = await apiFetch('/status');
-      setBadge(els.c, !!j.cronix); setDot(els.dotC, !!j.cronix);
-      setBadge(els.n, !!j.ngrok);  setDot(els.dotN, !!j.ngrok);
-      els.lastRefresh.textContent = 'Updated ' + nowTime();
-      els.msg.textContent='Ready';
-    }catch(e){
-      setBadge(els.c, false); setDot(els.dotC, false);
-      setBadge(els.n, false); setDot(els.dotN, false);
-      els.msg.textContent='Status error';
-    }
-  }
+  els.keysBox.addEventListener('click',async e=>{const t=e.target;const revoke=t.closest('[data-row-revoke]');const unrevoke=t.closest('[data-row-unrevoke]');const del=t.closest('[data-row-del]');const copy=t.closest('[data-copy]');if(revoke){const ok=await confirmDialog('Revoke this key?','Users will be blocked until unrevoked.');if(ok)await doAction('/keys/revoke',{key:revoke.dataset.rowRevoke});return}if(unrevoke){const ok=await confirmDialog('Unrevoke this key?','Access will be restored.');if(ok)await doAction('/keys/unrevoke',{key:unrevoke.dataset.rowUnrevoke});return}if(del){const ok=await confirmDialog('Delete this key?','Permanent removal.');if(ok)await doAction('/keys/delete',{key:del.dataset.rowDel});return}if(copy){try{await navigator.clipboard.writeText(copy.dataset.copy);toast('Key copied')}catch{toast('Copy failed')}}})
 
-  // Buttons + confirms
-  document.addEventListener('click', async (e)=>{
-    const b = e.target.closest('button[data-act]');
-    if(!b) return;
-    const path = b.dataset.act;
-    if(b.dataset.confirm){
-      const ok = await confirmDialog(b.dataset.confirm);
-      if(!ok) return;
-    }
-    doAction(path);
-  });
+  document.getElementById('btnGen').onclick=async()=>{const owner=(ownerEl.value||'manual').trim();const n=Math.max(1,Math.min(100,parseInt(countEl.value||'1')));const res=await doAction('/keys/generate',{n,owner});const keys=(res&&Array.isArray(res.created))?res.created:[];if(keys.length){keysPopup(owner,keys)}else{toast('No keys returned')}}
+  document.getElementById('btnAdd').onclick=async()=>{const key=(keyvalEl.value||'').trim().toLowerCase();if(!key){toast('Enter a key');return}const owner=(newownerEl.value||'manual').trim();await doAction('/keys/add',{key,owner});keyAddedPopup(owner,key)}
+  document.getElementById('btnRefresh').onclick=()=>loadKeys()
+  searchEl?.addEventListener('input',renderKeys);statusFilterEl?.addEventListener('change',renderKeys)
 
-  // Settings
-  const apiInput = document.getElementById('apiInput');
-  const secretInput = document.getElementById('secretInput');
-  const saveCfg = document.getElementById('saveCfg');
-  const resetCfg = document.getElementById('resetCfg');
-  apiInput.value = store.api; secretInput.value = store.secret;
-  saveCfg.onclick = ()=>{ store.api = apiInput.value.trim(); store.secret = secretInput.value.trim(); toast('Saved'); };
-  resetCfg.onclick = ()=>{ store.reset(); apiInput.value = store.api; secretInput.value = store.secret; toast('Reset'); };
-
-  // Keys
-  const ownerEl = document.getElementById('owner');
-  const countEl = document.getElementById('count');
-  const keyvalEl = document.getElementById('keyval');
-  const newownerEl = document.getElementById('newowner');
-  const searchEl = document.getElementById('search');
-  const statusFilterEl = document.getElementById('statusFilter');
-
-  document.getElementById('btnGen').onclick = async ()=>{
-    const owner = (ownerEl.value || 'manual').trim();
-    const n = Math.max(1, Math.min(100, parseInt(countEl.value || '1')));
-    const res = await doAction('/keys/generate', { n, owner });
-    let keys = [];
-    if(res && Array.isArray(res.keys)) keys = res.keys.map(k=>k.key||k);
-    else if(typeof res === 'string'){
-      keys = res.split(/\s+/).filter(s=>s.length>=6 && /[a-z0-9]/i.test(s));
-    }
-    if(keys.length){ keysPopup(owner, keys); }
-  };
-
-  document.getElementById('btnAdd').onclick = async ()=>{
-    const key = (keyvalEl.value || '').trim().toLowerCase(); if(!key){ toast('Enter a key'); return; }
-    const owner = (newownerEl.value || 'manual').trim();
-    await doAction('/keys/add', { key, owner });
-    const html = `<div class="stack"><div><b>Owner:</b> ${owner}</div>
-      <div class="kitem"><span class="kkey" data-copy="${key}">${key}</span><button data-copybtn="${key}">Copy</button></div></div>`;
-    openModal({title:'Key added', html, buttons:[{id:'close',label:'Close'}]});
-    const clickHandler = async (e)=>{
-      const cell = e.target.closest('[data-copy]');
-      const btn = e.target.closest('[data-copybtn]');
-      const val = cell?.dataset.copy || btn?.dataset.copybtn;
-      if(val){ try{ await navigator.clipboard.writeText(val); toast('Copied'); }catch{ toast('Copy failed'); } }
-    };
-    els.mContent.addEventListener('click', clickHandler, {once:true});
-  };
-
-  document.getElementById('btnRefresh').onclick = ()=> loadKeys();
-
-  let allKeys = [];
-  function renderKeys(){
-    const q = (searchEl.value||'').toLowerCase(); const filt = statusFilterEl.value;
-    const rows = allKeys.filter(k=>{
-      const text = `${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();
-      if(q && !text.includes(q)) return false;
-      const isRev = (k.status||'').toLowerCase().includes('revok');
-      if(filt==='active' && isRev) return false; if(filt==='revoked' && !isRev) return false; return true;
-    });
-
-    let html = `<table class="table" role="table"><thead><tr><th>Key</th><th>Owner</th><th>Status</th><th class="right">Actions</th></tr></thead><tbody>`;
-    for(const k of rows){
-      const rev = (k.status||'').toLowerCase().includes('revok');
-      html += `<tr class="key-row ${rev?'rev':''}">
-        <td style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace;word-break:break-all" data-copy="${k.key}">${k.key}</td>
-        <td>${k.owner||''}</td>
-        <td>${rev?'<span class="badge b-rev">REVOKED</span>':'<span class="badge b-ok">ACTIVE</span>'}</td>
-        <td class="right">
-          ${rev?`<button class="btn-primary" data-row-unrevoke="${k.key}">Unrevoke</button>`:`<button class="btn-danger" data-row-revoke="${k.key}">Revoke</button>`}
-          <button class="btn-ghost" data-row-del="${k.key}">Delete</button>
-        </td>
-      </tr>`;
-    }
-    html += `</tbody></table>`;
-    els.keysBox.innerHTML = html;
-  }
-
-  els.keysBox.addEventListener('click', async (e)=>{
-    const t = e.target;
-    const revoke = t.closest('[data-row-revoke]');
-    const unrevoke = t.closest('[data-row-unrevoke]');
-    const del = t.closest('[data-row-del]');
-    const copy = t.closest('[data-copy]');
-    if(revoke){
-      const ok = await confirmDialog('Revoke this key?','Users will be blocked until unrevoked.');
-      if(ok) await doAction('/keys/revoke', { key: revoke.dataset.rowRevoke });
-      return;
-    }
-    if(unrevoke){
-      const ok = await confirmDialog('Unrevoke this key?','Access will be restored.');
-      if(ok) await doAction('/keys/unrevoke', { key: unrevoke.dataset.rowUnrevoke });
-      return;
-    }
-    if(del){
-      const ok = await confirmDialog('Delete this key?','Permanent removal.');
-      if(ok) await doAction('/keys/delete', { key: del.dataset.rowDel });
-      return;
-    }
-    if(copy){ try{ await navigator.clipboard.writeText(copy.dataset.copy); toast('Key copied'); }catch{ toast('Copy failed'); } }
-  });
-
-  async function loadKeys(){
-    els.keysBox.textContent = 'Loading…';
-    try{ const j = await apiFetch('/keys'); allKeys = j.keys||[]; renderKeys(); }
-    catch{ els.keysBox.textContent = 'Failed to load keys'; }
-  }
-
-  searchEl?.addEventListener('input', renderKeys);
-  statusFilterEl?.addEventListener('change', renderKeys);
-
-  // Init
-  refresh(); loadKeys(); setInterval(refresh, 4000);
+  refresh();loadKeys();setInterval(refresh,4000)
 </script>
