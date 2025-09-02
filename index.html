@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cronix Admin Panel 3</title>
+<title>Cronix Admin Panel</title>
 <style>
   :root{color-scheme:dark light;--bg:#0b0b0b;--card:#141414;--muted:#9aa0a6;--text:#eee;--border:#242424;--border-strong:#2f2f2f;--accent:#ff2424;--ok:#14351a;--ok-text:#65e077;--bad:#3a1414;--bad-text:#ff8a8a;--btn:#1d1d1d;--btn-hover:#262626;--shadow:0 10px 24px rgba(0,0,0,.35)}
   *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, Segoe UI, Arial}
@@ -111,31 +111,9 @@
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-  // Hardcoded control URL + force it into localStorage so old values don't override
   const DEFAULTS={API:"https://01ff65da4e6f.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
-  localStorage.setItem('cronix_api', DEFAULTS.API);
-  localStorage.setItem('cronix_secret', DEFAULTS.SECRET);
-
-  const store={
-    get api(){return localStorage.getItem('cronix_api')||DEFAULTS.API},
-    set api(v){localStorage.setItem('cronix_api',v)},
-    get secret(){return localStorage.getItem('cronix_secret')||DEFAULTS.SECRET},
-    set secret(v){localStorage.setItem('cronix_secret',v)},
-    reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}
-  };
-
-  const els={
-    msg:document.getElementById('msg'),
-    c:document.getElementById('c'),
-    dotC:document.getElementById('dot-c'),
-    lastRefresh:document.getElementById('lastRefresh'),
-    toast:document.getElementById('toast'),
-    keysBox:document.getElementById('keys'),
-    modalRoot:document.getElementById('modalRoot'),
-    mTitle:document.getElementById('mTitle'),
-    mContent:document.getElementById('mContent'),
-    mFooter:document.getElementById('mFooter')
-  };
+  const store={get api(){return localStorage.getItem('cronix_api')||DEFAULTS.API},set api(v){localStorage.setItem('cronix_api',v)},get secret(){return localStorage.getItem('cronix_secret')||DEFAULTS.SECRET},set secret(v){localStorage.setItem('cronix_secret',v)},reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}};
+  const els={msg:document.getElementById('msg'),c:document.getElementById('c'),dotC:document.getElementById('dot-c'),lastRefresh:document.getElementById('lastRefresh'),toast:document.getElementById('toast'),keysBox:document.getElementById('keys'),modalRoot:document.getElementById('modalRoot'),mTitle:document.getElementById('mTitle'),mContent:document.getElementById('mContent'),mFooter:document.getElementById('mFooter')};
 
   function toast(t){els.toast.textContent=t;els.toast.classList.add('show');setTimeout(()=>els.toast.classList.remove('show'),2000)}
   function openModal({title='Dialog',html='',buttons=[{id:'ok',label:'OK'}]}){els.mTitle.textContent=title;els.mContent.innerHTML=html;els.mFooter.innerHTML='';buttons.forEach(b=>{const x=document.createElement('button');x.textContent=b.label;x.className=(b.variant||'btn-rim-small');x.dataset.id=b.id;els.mFooter.appendChild(x)});els.modalRoot.style.display='flex';els.modalRoot.setAttribute('aria-hidden','false');return new Promise(res=>{const onClick=e=>{const t=e.target.closest('button');if(!t)return;cleanup();closeModal();res(t.dataset.id)};const onEsc=e=>{if(e.key==='Escape'){cleanup();closeModal();res('esc')}};const onBack=e=>{if(e.target===els.modalRoot){cleanup();closeModal();res('backdrop')}};function cleanup(){els.mFooter.removeEventListener('click',onClick);window.removeEventListener('keydown',onEsc);els.modalRoot.removeEventListener('click',onBack)};els.mFooter.addEventListener('click',onClick);window.addEventListener('keydown',onEsc);els.modalRoot.addEventListener('click',onBack)})}
@@ -162,7 +140,7 @@
   let allKeys=[]
   function renderKeys(){const q=(searchEl.value||'').toLowerCase();const filt=statusFilterEl.value;const rows=allKeys.filter(k=>{const text=`${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();if(q&&!text.includes(q))return false;const rev=(k.status||'').toLowerCase().includes('revok');if(filt==='active'&&rev)return false;if(filt==='revoked'&&!rev)return false;return true}).map(k=>`<tr class="key-row ${(k.status||'').toLowerCase().includes('revok')?'rev':''}"><td style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all" data-copy="${k.key}">${k.key}</td><td>${k.owner||''}</td><td>${(k.status||'').toLowerCase().includes('revok')?'<span class="badge b-bad">REVOKED</span>':'<span class="badge b-ok">ACTIVE</span>'}</td><td class="right">${(k.status||'').toLowerCase().includes('revok')?`<button class="btn-rim-small" data-row-unrevoke="${k.key}">Unrevoke</button>`:`<button class="btn-danger" data-row-revoke="${k.key}">Revoke</button>`}<button class="btn-ghost" data-row-del="${k.key}">Delete</button></td></tr>`).join('');els.keysBox.innerHTML=`<table class="table"><thead><tr><th>Key</th><th>Owner</th><th>Status</th><th class="right">Actions</th></tr></thead><tbody>${rows}</tbody></table>`}
 
-  els.keysBox.addEventListener('click',async e=>{const t=e.target;const revoke=t.closest('[data-row-revoke]');const unrevoke=t.closest('[data-row-unrevoke]');const del=t.closest('[data-row-del]');const copy=t.closest('[data-copy]');if(revoke){const ok=await confirmDialog('Revoke this key?','Users will be blocked until unrevoked.');if(ok)await doAction('/keys/revoke',{key:revoke.dataset.rowRevoke});return}if(unrevoke){const ok=await confirmDialog('Unrevoke this key?','Access will be restored.');if(ok)await doAction('/keys/unrevoke',{key:unrevoke.dataset.rowUnrevoke});return}if(del){const ok=await confirmDialog('Delete this key?','Permanent removal.');if(ok)await doAction('/keys/delete',{key:del.dataset.rowDel});return}if(copy){try{await navigator.clipboard.writeText(copy.dataset.copy);toast('Key copied')}catch{toast('Copy failed')}})
+  els.keysBox.addEventListener('click',async e=>{const t=e.target;const revoke=t.closest('[data-row-revoke]');const unrevoke=t.closest('[data-row-unrevoke]');const del=t.closest('[data-row-del]');const copy=t.closest('[data-copy]');if(revoke){const ok=await confirmDialog('Revoke this key?','Users will be blocked until unrevoked.');if(ok)await doAction('/keys/revoke',{key:revoke.dataset.rowRevoke});return}if(unrevoke){const ok=await confirmDialog('Unrevoke this key?','Access will be restored.');if(ok)await doAction('/keys/unrevoke',{key:unrevoke.dataset.rowUnrevoke});return}if(del){const ok=await confirmDialog('Delete this key?','Permanent removal.');if(ok)await doAction('/keys/delete',{key:del.dataset.rowDel});return}if(copy){try{await navigator.clipboard.writeText(copy.dataset.copy);toast('Key copied')}catch{toast('Copy failed')}}})
 
   document.getElementById('btnGen').onclick=async()=>{const owner=(ownerEl.value||'manual').trim();const n=Math.max(1,Math.min(100,parseInt(countEl.value||'1')));const res=await doAction('/keys/generate',{n,owner});const keys=(res&&Array.isArray(res.created))?res.created:[];if(keys.length){keysPopup(owner,keys)}else{toast('No keys returned')}}
   document.getElementById('btnAdd').onclick=async()=>{const key=(keyvalEl.value||'').trim().toLowerCase();if(!key){toast('Enter a key');return}const owner=(newownerEl.value||'manual').trim();await doAction('/keys/add',{key,owner});keyAddedPopup(owner,key)}
