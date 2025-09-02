@@ -1,7 +1,8 @@
+
 <!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cronix Admin Panel 4</title>
+<title>Cronix Admin Panel</title>
 <style>
   :root{color-scheme:dark light;--bg:#0b0b0b;--card:#141414;--muted:#9aa0a6;--text:#eee;--border:#242424;--border-strong:#2f2f2f;--accent:#ff2424;--ok:#14351a;--ok-text:#65e077;--bad:#3a1414;--bad-text:#ff8a8a;--btn:#1d1d1d;--btn-hover:#262626;--shadow:0 10px 24px rgba(0,0,0,.35)}
   *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, Segoe UI, Arial}
@@ -111,7 +112,7 @@
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-  const DEFAULTS={API:"https://01ff65da4e6f.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
+  const DEFAULTS={API:"https://9ed41e73e5f8.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
   const store={get api(){return localStorage.getItem('cronix_api')||DEFAULTS.API},set api(v){localStorage.setItem('cronix_api',v)},get secret(){return localStorage.getItem('cronix_secret')||DEFAULTS.SECRET},set secret(v){localStorage.setItem('cronix_secret',v)},reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}};
   const els={msg:document.getElementById('msg'),c:document.getElementById('c'),dotC:document.getElementById('dot-c'),lastRefresh:document.getElementById('lastRefresh'),toast:document.getElementById('toast'),keysBox:document.getElementById('keys'),modalRoot:document.getElementById('modalRoot'),mTitle:document.getElementById('mTitle'),mContent:document.getElementById('mContent'),mFooter:document.getElementById('mFooter')};
 
