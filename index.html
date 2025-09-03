@@ -1,152 +1,664 @@
-
 <!doctype html>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cronix Admin Panel</title>
-<style>
-  :root{color-scheme:dark light;--bg:#0b0b0b;--card:#141414;--muted:#9aa0a6;--text:#eee;--border:#242424;--border-strong:#2f2f2f;--accent:#ff2424;--ok:#14351a;--ok-text:#65e077;--bad:#3a1414;--bad-text:#ff8a8a;--btn:#1d1d1d;--btn-hover:#262626;--shadow:0 10px 24px rgba(0,0,0,.35)}
-  *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, Segoe UI, Arial}
-  .sheet{max-width:980px;margin:18px auto;padding:0 14px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
-  .hdr{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(16,16,16,.95),rgba(16,16,16,.8));backdrop-filter:blur(6px);border-bottom:1px solid var(--border);padding:12px 14px;border-top-left-radius:16px;border-top-right-radius:16px}
-  .title{display:flex;align-items:center;gap:10px;font-weight:800}.sub{color:var(--muted);font-size:12px}
-  .pill{border:1px solid var(--border-strong);padding:7px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:8px}
-  .dot{width:8px;height:8px;border-radius:50%}.ok{background:#22c55e}.bad{background:#ef4444}.muted{color:var(--muted)}
-  .body{padding:14px}.section{padding:12px 0;border-bottom:1px dashed var(--border)} .section:last-child{border-bottom:none}
-  .row{display:flex;gap:10px;flex-wrap:wrap}.stack{display:flex;flex-direction:column;gap:10px}
-  input,button,select{background:var(--btn);border:1px solid var(--border-strong);color:var(--text);padding:10px 12px;border-radius:12px;min-height:44px}
-  button{cursor:pointer}button:hover{background:var(--btn-hover)}.btn-danger{border-color:#ff0000}.btn-ghost{background:transparent}
-  @property --a{syntax:"<angle>";inherits:false;initial-value:0deg}@keyframes spin{to{--a:360deg}}
-  .btn-rim{--border-w:2px;position:relative;border:var(--border-w) solid transparent;border-radius:12px;color:var(--text);background:linear-gradient(var(--btn),var(--btn)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 4s linear infinite}
-  .btn-rim:hover{background:linear-gradient(var(--btn-hover),var(--btn-hover)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box}
-  .card-rim{--r:16px;position:relative;border-radius:var(--r);background:linear-gradient(var(--card),var(--card)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 8s linear infinite;border:2px solid transparent}
-  .card-rim .hdr{border-top-left-radius:16px;border-top-right-radius:16px}
-  .rim-focus:focus{border-color:transparent;background:linear-gradient(var(--btn),var(--btn)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 6s linear infinite}
-  .badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid var(--border-strong)}.b-ok{background:#14351a;color:var(--ok-text)}.b-bad{background:#3a1414;color:var(--bad-text)}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-  .table{width:100%;border-collapse:collapse;margin-top:10px}.table th,.table td{padding:10px;border-bottom:1px solid var(--border)}.table th{text-align:left;color:var(--muted);font-weight:600}
-  .key-row.rev{background:linear-gradient(0deg,rgba(255,77,77,.08),rgba(255,77,77,.08))}.right{margin-left:auto}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111;border:1px solid var(--border-strong);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,bottom .2s;z-index:50}
-  .toast.show{opacity:1;pointer-events:auto;bottom:24px}
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:60;padding:16px}
-  .modal{max-width:560px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-  .modal header{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:800}
-  .modal .content{padding:14px 16px}
-  .modal footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-  .modal .klist{display:flex;flex-direction:column;gap:8px}.modal .kitem{display:flex;gap:8px;align-items:center}
-  .modal .kkey{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;border:1px dashed var(--border);border-radius:10px;padding:8px 10px}
-  .btn-rim-small{--border-w:2px;border-radius:10px;border:var(--border-w) solid transparent;background:linear-gradient(var(--btn),var(--btn)) padding-box,conic-gradient(from var(--a),#ff2424,#8b0000,#000000,#ff2424) border-box;animation:spin 4s linear infinite;padding:8px 12px;color:var(--text)}
-  @media (max-width:420px){.toolbar button{flex:1 1 47%}.row input,.row select{flex:1 1 47%}}
-</style>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CRONIX — Admin Panel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap');
 
-<div class="sheet">
-  <div class="card card-rim" role="region" aria-label="Cronix One-Page Panel">
-    <header class="hdr">
-      <div class="title">Cronix Admin Panel <span class="sub" id="lastRefresh">—</span></div>
-      <div class="row" style="margin-top:8px">
-        <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-bad">OFFLINE</span></span>
-        <span class="pill right"><span id="msg" class="muted">Ready</span></span>
+    /* ====== Global / Theme (from Code 1 vibe) ====== */
+    :root{
+      --bg0:#000;
+      --bg1:#0b0000;
+      --panel:#140000;
+      --panel-weak:#150000cc;
+      --border:#220000;
+      --border-strong:#2d0000;
+      --text:#eee;
+      --muted:#bbb;
+      --accent:#ff2424;
+      --accent-deep:#8b0000;
+      --accent-faint:rgba(255,36,36,.15);
+      --shadow:0 10px 24px rgba(0,0,0,.35);
+      --ok:#14351a; --ok-text:#65e077;
+      --bad:#3a1414; --bad-text:#ff8a8a;
+      --btn:#1a0000; --btn-hover:#230000;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Orbitron',system-ui,Segoe UI,Arial;
+      color:var(--text);
+      background:linear-gradient(180deg,var(--bg0) 0%, var(--bg1) 100%);
+      line-height:1.5;
+      overflow-x:hidden;
+    }
+    .glow-red { text-shadow:0 0 8px var(--accent), 0 0 20px var(--accent); }
+
+    /* ====== HERO ====== */
+    header.hero{
+      padding:60px 5% 40px;
+      background:radial-gradient(circle at center, #150000 0%, #000 80%);
+      display:flex; flex-direction:column; align-items:center; text-align:center;
+      position:relative; overflow:hidden; border-radius:0 0 40px 40px;
+    }
+    header.hero::before{
+      content:""; position:absolute; inset:-50%;
+      background:radial-gradient(circle, rgba(255,36,36,.15) 0%, transparent 60%);
+      animation:pulse 6s infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform:scale(1); opacity:.6; }
+      50%{ transform:scale(1.2); opacity:.2; }
+    }
+    .logo{
+      width:180px; height:180px;
+      background:url('https://i.postimg.cc/MHff0dQQ/cronix.webp') no-repeat center/cover;
+      border-radius:50%;
+      filter:drop-shadow(0 0 25px var(--accent));
+      margin-bottom:18px; position:relative; z-index:2; animation:eyePulse 4s infinite;
+    }
+    @keyframes eyePulse{
+      0%,100%{ filter:drop-shadow(0 0 25px var(--accent)); }
+      50%{ filter:drop-shadow(0 0 50px #ff4444); }
+    }
+    header.hero h1{ font-size:2.6rem; margin:8px 0 6px; position:relative; z-index:2; }
+    header.hero p{ color:#bbb; margin:0; position:relative; z-index:2; font-size:1.05rem; }
+
+    /* ====== Sheet / Card ====== */
+    .sheet{ max-width:1000px; margin:26px auto; padding:0 14px; }
+    .card{
+      background:rgba(20,0,0,.85);
+      border:1px solid var(--border);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    /* Conic red-black rim like Code 2 but themed */
+    @property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
+    @keyframes spin{to{--a:360deg}}
+    .card-rim{
+      --r:20px;
+      position:relative; border-radius:var(--r);
+      background:
+        linear-gradient(var(--panel),var(--panel)) padding-box,
+        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
+      border:2px solid transparent;
+      animation:spin 8s linear infinite;
+    }
+
+    /* Sticky header inside card */
+    .hdr{
+      position:sticky; top:0; z-index:5;
+      background:linear-gradient(180deg,rgba(16,0,0,.95),rgba(16,0,0,.8));
+      backdrop-filter:blur(6px);
+      border-bottom:1px solid var(--border);
+      padding:14px 16px;
+    }
+    .title{ display:flex; align-items:center; gap:10px; font-weight:800; }
+    .sub{ color:var(--muted); font-size:12px; }
+
+    /* Pills / Badges */
+    .row{ display:flex; gap:10px; flex-wrap:wrap; }
+    .right{ margin-left:auto; }
+    .pill{
+      border:1px solid var(--border);
+      padding:8px 12px;
+      border-radius:999px;
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(20,0,0,.5);
+    }
+    .dot{width:8px; height:8px; border-radius:50%}
+    .ok{background:#22c55e} .bad{background:#ef4444}
+    .badge{padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; border:1px solid var(--border)}
+    .b-ok{background:var(--ok); color:var(--ok-text)}
+    .b-bad{background:var(--bad); color:var(--bad-text)}
+    .muted{ color:var(--muted); }
+
+    /* Body / Sections */
+    .body{ padding:16px; }
+    .section{ padding:14px 0; border-bottom:1px dashed var(--border); }
+    .section:last-child{ border-bottom:none; }
+    .stack{ display:flex; flex-direction:column; gap:10px; }
+
+    /* Buttons & Inputs (Code 1 glow + Code 2 rim) */
+    input,button,select{
+      background:var(--btn);
+      border:1px solid var(--border-strong);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      min-height:44px;
+      font-weight:800;
+    }
+    .btn{ 
+      display:inline-block; cursor:pointer; text-decoration:none; text-align:center;
+      border-radius:40px; background:var(--accent); color:#fff;
+      box-shadow:0 0 12px var(--accent), inset 0 0 8px var(--accent-deep);
+      transition:.25s;
+    }
+    .btn:hover{ background:var(--accent-deep); box-shadow:0 0 18px #ff4444; }
+    .btn:active{ transform:scale(.98); }
+
+    .btn-ghost{ background:transparent; border-color:var(--border-strong); }
+    .btn-danger{ background:#2c0000; border-color:#ff0000; }
+    .btn-danger:hover{ background:#3d0000; }
+
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-rim{
+      --border-w:2px; border:var(--border-w) solid transparent; border-radius:14px;
+      color:var(--text);
+      background:
+        linear-gradient(var(--btn),var(--btn)) padding-box,
+        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
+      animation:spin 4s linear infinite;
+      padding:12px 16px;
+    }
+    .btn-rim:hover{
+      background:
+        linear-gradient(var(--btn-hover),var(--btn-hover)) padding-box,
+        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
+    }
+    .btn-rim-small{
+      --border-w:2px; border:var(--border-w) solid transparent; border-radius:10px;
+      background:
+        linear-gradient(var(--btn),var(--btn)) padding-box,
+        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
+      animation:spin 4s linear infinite;
+      padding:8px 12px; color:var(--text);
+      font-weight:800;
+    }
+
+    .rim-focus:focus{
+      outline:none; border-color:transparent;
+      background:
+        linear-gradient(var(--btn),var(--btn)) padding-box,
+        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
+      animation:spin 6s linear infinite;
+    }
+
+    /* Keys table */
+    .table{ width:100%; border-collapse:collapse; margin-top:10px; }
+    .table th,.table td{ padding:10px; border-bottom:1px solid var(--border); }
+    .table th{ text-align:left; color:var(--muted); font-weight:800; }
+    .key-row.rev{ background:linear-gradient(0deg, rgba(255,77,77,.08), rgba(255,77,77,.08)); }
+
+    /* Modal + Toast styled like Code 1 */
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:18px; background:#110000; border:1px solid var(--border);
+      padding:10px 14px; border-radius:12px; box-shadow:var(--shadow);
+      opacity:0; pointer-events:none; transition:opacity .2s, bottom .2s; z-index:50;
+      text-shadow:0 0 8px var(--accent), 0 0 12px var(--accent);
+    }
+    .toast.show{ opacity:1; pointer-events:auto; bottom:24px; }
+
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(3px);
+      display:none; align-items:center; justify-content:center; z-index:60; padding:16px;
+    }
+    .modal{
+      max-width:560px; width:100%; background:rgba(20,0,0,.9);
+      border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow); overflow:hidden;
+    }
+    .modal header{ padding:14px 16px; border-bottom:1px solid var(--border); font-weight:800; }
+    .modal .content{ padding:14px 16px; }
+    .modal footer{ padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .modal .klist{ display:flex; flex-direction:column; gap:8px; }
+    .modal .kitem{ display:flex; gap:8px; align-items:center; }
+    .modal .kkey{
+      flex:1; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; word-break:break-all;
+      border:1px dashed var(--border); border-radius:10px; padding:8px 10px; background:#0f0000;
+    }
+
+    /* Embers (from Code 1) */
+    .ember{
+      position:fixed; width:4px; height:4px; background:var(--accent);
+      border-radius:50%; box-shadow:0 0 8px var(--accent);
+      opacity:.7; pointer-events:none; animation:float 8s linear infinite;
+    }
+    @keyframes float{
+      from{ transform:translateY(100vh) scale(.5); opacity:.8; }
+      to{ transform:translateY(-10vh) scale(1.5); opacity:0; }
+    }
+
+    /* Details summary styling (themed) */
+    details{ border:1px solid var(--border); border-radius:16px; background:rgba(20,0,0,.5); }
+    details[open]{ background:rgba(20,0,0,.75); }
+    details summary{
+      cursor:pointer; padding:12px 14px; font-weight:800; color:var(--accent);
+      list-style:none; border-bottom:1px solid var(--border);
+    }
+    details summary::-webkit-details-marker{ display:none; }
+    details .details-body{ padding:12px 14px; }
+
+    /* Responsive tweaks */
+    @media (max-width:420px){
+      .toolbar button{ flex:1 1 47%; }
+      .row input,.row select{ flex:1 1 47%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="logo"></div>
+    <h1 class="glow-red">CRONIX Admin Panel</h1>
+    <p>Manage keys, control the service, and monitor status — all in one premium panel.</p>
+  </header>
+
+  <!-- ===== PANEL ===== -->
+  <div class="sheet">
+    <div class="card card-rim" role="region" aria-label="Cronix One-Page Panel">
+      <div class="hdr">
+        <div class="title">Control Center <span class="sub" id="lastRefresh">—</span></div>
+        <div class="row" style="margin-top:8px">
+          <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-bad">OFFLINE</span></span>
+          <span class="pill right"><span id="msg" class="muted">Ready</span></span>
+        </div>
       </div>
-    </header>
-    <div class="body">
-      <section class="section">
-        <div class="toolbar">
-          <button data-act="/start" class="btn-rim">Start Cronix</button>
-          <button data-act="/stop" class="btn-danger" data-confirm="Stop Cronix?">Stop Cronix</button>
-        </div>
-        <div class="muted" style="margin-top:8px"><b>Made by: Zenyical</b>.</div>
-      </section>
-      <section class="section">
-        <details>
-          <summary>Settings — API & Token (DONT TOUCH)</summary>
-          <div class="details-body stack">
-            <label>API Base URL
-              <input id="apiInput" class="rim-focus" placeholder="https://your-ngrok-host.ngrok.app" />
-            </label>
-            <label>Panel Secret
-              <input id="secretInput" class="rim-focus" placeholder="••••••••" />
-            </label>
-            <div class="row">
-              <button id="saveCfg" class="btn-rim">Save</button>
-              <button id="resetCfg" class="btn-ghost">Reset to Default</button>
-              <span class="muted">Saved only in this browser.</span>
-            </div>
+
+      <div class="body">
+        <!-- Actions -->
+        <section class="section">
+          <div class="toolbar">
+            <button data-act="/start" class="btn-rim">Start Cronix</button>
+            <button data-act="/stop" class="btn-danger" data-confirm="Stop Cronix?">Stop Cronix</button>
           </div>
-        </details>
-      </section>
-      <section class="section" aria-label="Keys Manager">
-        <h3 style="margin:0 0 8px">Keys</h3>
-        <div class="row">
-          <input id="owner" class="rim-focus" placeholder="Owner name (e.g. Timmy123)" />
-          <input id="count" class="rim-focus" type="number" value="1" min="1" max="100" style="width:120px" />
-          <button id="btnGen" class="btn-rim">Generate Keys</button>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <input id="keyval" class="rim-focus" placeholder="Paste a key (lowercase)" style="flex:1" />
-          <input id="newowner" class="rim-focus" placeholder="Owner for this key" style="width:220px" />
-          <button id="btnAdd" class="btn-rim">Add Key</button>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <input id="search" class="rim-focus" placeholder="Search key or owner…" style="flex:1" />
-          <select id="statusFilter" class="rim-focus" title="Filter">
-            <option value="all">All</option>
-            <option value="active">Active</option>
-            <option value="revoked">Revoked</option>
-          </select>
-          <button id="btnRefresh" class="btn-rim">Refresh List</button>
-        </div>
-        <div class="muted">Tap a key to copy. Red rows = revoked.</div>
-        <div id="keys" style="margin-top:8px">Loading…</div>
-      </section>
+          <div class="muted" style="margin-top:8px"><b>Made by: Zenyical</b>.</div>
+        </section>
+
+        <!-- Settings -->
+        <section class="section">
+          <details>
+            <summary>Settings — API &amp; Token (DONT TOUCH)</summary>
+            <div class="details-body stack">
+              <label>API Base URL
+                <input id="apiInput" class="rim-focus" placeholder="https://your-ngrok-host.ngrok.app" />
+              </label>
+              <label>Panel Secret
+                <input id="secretInput" class="rim-focus" placeholder="••••••••" />
+              </label>
+              <div class="row">
+                <button id="saveCfg" class="btn-rim">Save</button>
+                <button id="resetCfg" class="btn-ghost">Reset to Default</button>
+                <span class="muted">Saved only in this browser.</span>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <!-- Keys -->
+        <section class="section" aria-label="Keys Manager">
+          <h3 style="margin:0 0 8px; color:var(--accent)">Keys</h3>
+          <div class="row">
+            <input id="owner" class="rim-focus" placeholder="Owner name (e.g. Timmy123)" />
+            <input id="count" class="rim-focus" type="number" value="1" min="1" max="100" style="width:120px" />
+            <button id="btnGen" class="btn-rim">Generate Keys</button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <input id="keyval" class="rim-focus" placeholder="Paste a key (lowercase)" style="flex:1" />
+            <input id="newowner" class="rim-focus" placeholder="Owner for this key" style="width:220px" />
+            <button id="btnAdd" class="btn-rim">Add Key</button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <input id="search" class="rim-focus" placeholder="Search key or owner…" style="flex:1" />
+            <select id="statusFilter" class="rim-focus" title="Filter">
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="revoked">Revoked</option>
+            </select>
+            <button id="btnRefresh" class="btn-rim">Refresh List</button>
+          </div>
+          <div class="muted">Tap a key to copy. Red rows = revoked.</div>
+          <div id="keys" style="margin-top:8px">Loading…</div>
+        </section>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="modalRoot" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-  <div class="modal" role="document" aria-labelledby="mTitle" aria-describedby="mContent">
-    <header id="mTitle">Dialog</header>
-    <div id="mContent" class="content">…</div>
-    <footer id="mFooter"></footer>
+  <!-- ===== Modal / Toast ===== -->
+  <div id="modalRoot" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="mTitle" aria-describedby="mContent">
+      <header id="mTitle">Dialog</header>
+      <div id="mContent" class="content">…</div>
+      <footer id="mFooter"></footer>
+    </div>
   </div>
-</div>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<script>
-  const DEFAULTS={API:"https://9ed41e73e5f8.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
-  const store={get api(){return localStorage.getItem('cronix_api')||DEFAULTS.API},set api(v){localStorage.setItem('cronix_api',v)},get secret(){return localStorage.getItem('cronix_secret')||DEFAULTS.SECRET},set secret(v){localStorage.setItem('cronix_secret',v)},reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}};
-  const els={msg:document.getElementById('msg'),c:document.getElementById('c'),dotC:document.getElementById('dot-c'),lastRefresh:document.getElementById('lastRefresh'),toast:document.getElementById('toast'),keysBox:document.getElementById('keys'),modalRoot:document.getElementById('modalRoot'),mTitle:document.getElementById('mTitle'),mContent:document.getElementById('mContent'),mFooter:document.getElementById('mFooter')};
+  <!-- ===== JS (all Code 2 functionality intact) ===== -->
+  <script>
+    // Defaults & storage
+    const DEFAULTS={API:"https://9ed41e73e5f8.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
+    const store={
+      get api(){return localStorage.getItem('cronix_api')||DEFAULTS.API},
+      set api(v){localStorage.setItem('cronix_api',v)},
+      get secret(){return localStorage.getItem('cronix_secret')||DEFAULTS.SECRET},
+      set secret(v){localStorage.setItem('cronix_secret',v)},
+      reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}
+    };
 
-  function toast(t){els.toast.textContent=t;els.toast.classList.add('show');setTimeout(()=>els.toast.classList.remove('show'),2000)}
-  function openModal({title='Dialog',html='',buttons=[{id:'ok',label:'OK'}]}){els.mTitle.textContent=title;els.mContent.innerHTML=html;els.mFooter.innerHTML='';buttons.forEach(b=>{const x=document.createElement('button');x.textContent=b.label;x.className=(b.variant||'btn-rim-small');x.dataset.id=b.id;els.mFooter.appendChild(x)});els.modalRoot.style.display='flex';els.modalRoot.setAttribute('aria-hidden','false');return new Promise(res=>{const onClick=e=>{const t=e.target.closest('button');if(!t)return;cleanup();closeModal();res(t.dataset.id)};const onEsc=e=>{if(e.key==='Escape'){cleanup();closeModal();res('esc')}};const onBack=e=>{if(e.target===els.modalRoot){cleanup();closeModal();res('backdrop')}};function cleanup(){els.mFooter.removeEventListener('click',onClick);window.removeEventListener('keydown',onEsc);els.modalRoot.removeEventListener('click',onBack)};els.mFooter.addEventListener('click',onClick);window.addEventListener('keydown',onEsc);els.modalRoot.addEventListener('click',onBack)})}
-  function closeModal(){els.modalRoot.style.display='none';els.modalRoot.setAttribute('aria-hidden','true')}
-  async function confirmDialog(msg,sub=''){const html=`<div class="stack"><div>${msg}</div>${sub?`<div class="muted">${sub}</div>`:''}</div>`;const id=await openModal({title:'Please confirm',html,buttons:[{id:'cancel',label:'Cancel',variant:'btn-ghost'},{id:'ok',label:'Confirm'}]});return id==='ok'}
-  function keysPopup(owner,keys){const list=keys.map(k=>`<div class="kitem"><span class="kkey" data-copy="${k}">${k}</span><button class="btn-rim-small" data-copybtn="${k}">Copy</button></div>`).join('');const html=`<div class="stack"><div><b>Owner:</b> ${owner}</div><div class="klist">${list}</div></div>`;openModal({title:'Keys generated',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});const h=async e=>{const cell=e.target.closest('[data-copy]');const btn=e.target.closest('[data-copybtn]');const val=cell?.dataset.copy||btn?.dataset.copybtn;if(val){try{await navigator.clipboard.writeText(val);toast('Copied')}catch{toast('Copy failed')}}};els.mContent.addEventListener('click',h,{once:true})}
-  function keyAddedPopup(owner,key){const html=`<div class="stack"><div><b>Owner:</b> ${owner}</div><div class="kitem"><span class="kkey" data-copy="${key}">${key}</span><button class="btn-rim-small" data-copybtn="${key}">Copy</button></div></div>`;openModal({title:'Key added',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});const h=async e=>{const cell=e.target.closest('[data-copy]');const btn=e.target.closest('[data-copybtn]');const val=cell?.dataset.copy||btn?.dataset.copybtn;if(val){try{await navigator.clipboard.writeText(val);toast('Copied')}catch{toast('Copy failed')}}};els.mContent.addEventListener('click',h,{once:true})}
+    const els={
+      msg:document.getElementById('msg'),
+      c:document.getElementById('c'),
+      dotC:document.getElementById('dot-c'),
+      lastRefresh:document.getElementById('lastRefresh'),
+      toast:document.getElementById('toast'),
+      keysBox:document.getElementById('keys'),
+      modalRoot:document.getElementById('modalRoot'),
+      mTitle:document.getElementById('mTitle'),
+      mContent:document.getElementById('mContent'),
+      mFooter:document.getElementById('mFooter')
+    };
 
-  function setBadge(el,up){el.textContent=up?'ONLINE':'OFFLINE';el.className='badge '+(up?'b-ok':'b-bad')}
-  function setDot(el,up){el.className='dot '+(up?'ok':'bad')}
-  const apiBase=()=> (store.api||'').replace(/\/+$/,'')
+    function toast(t){
+      els.toast.textContent=t;
+      els.toast.classList.add('show');
+      setTimeout(()=>els.toast.classList.remove('show'),2000);
+    }
 
-  async function apiFetch(path,opts={}){const init={method:'GET',headers:{'X-Panel-Secret':store.secret,'Content-Type':'application/json'},...opts};const url=apiBase()+path;const r=await fetch(url,init);if(!r.ok){const t=await r.text().catch(()=>String(r.status));throw new Error(`${r.status} ${t.slice(0,200)}`)}const ct=r.headers.get('content-type')||'';return ct.includes('application/json')?r.json():r.text()}
-  async function doAction(path,body){els.msg.textContent='Working…';try{const res=await apiFetch(path,{method:'POST',body:body?JSON.stringify(body):undefined});els.msg.textContent=typeof res==='string'?res:'Done';toast('Success');await refresh();if(path.startsWith('/keys'))loadKeys();return res}catch(e){els.msg.textContent=`Error: ${e.message}`;toast('Failed');throw e}}
-  async function refresh(){try{const j=await apiFetch('/status');setBadge(els.c,!!j.cronix);setDot(els.dotC,!!j.cronix);els.lastRefresh.textContent='Updated '+new Date().toLocaleTimeString();els.msg.textContent='Ready'}catch(e){setBadge(els.c,false);setDot(els.dotC,false);els.msg.textContent='Status error'}}
+    function openModal({title='Dialog',html='',buttons=[{id:'ok',label:'OK'}]}){
+      els.mTitle.textContent=title;
+      els.mContent.innerHTML=html;
+      els.mFooter.innerHTML='';
+      buttons.forEach(b=>{
+        const x=document.createElement('button');
+        x.textContent=b.label;
+        x.className=(b.variant||'btn-rim-small');
+        x.dataset.id=b.id;
+        els.mFooter.appendChild(x);
+      });
+      els.modalRoot.style.display='flex';
+      els.modalRoot.setAttribute('aria-hidden','false');
 
-  document.addEventListener('click',async e=>{const b=e.target.closest('button[data-act]');if(!b)return;const path=b.dataset.act;if(b.dataset.confirm){const ok=await confirmDialog(b.dataset.confirm);if(!ok)return}doAction(path)})
+      return new Promise(res=>{
+        const onClick=e=>{
+          const t=e.target.closest('button'); if(!t) return;
+          cleanup(); closeModal(); res(t.dataset.id);
+        };
+        const onEsc=e=>{
+          if(e.key==='Escape'){ cleanup(); closeModal(); res('esc'); }
+        };
+        const onBack=e=>{
+          if(e.target===els.modalRoot){ cleanup(); closeModal(); res('backdrop'); }
+        };
+        function cleanup(){
+          els.mFooter.removeEventListener('click',onClick);
+          window.removeEventListener('keydown',onEsc);
+          els.modalRoot.removeEventListener('click',onBack);
+        }
+        els.mFooter.addEventListener('click',onClick);
+        window.addEventListener('keydown',onEsc);
+        els.modalRoot.addEventListener('click',onBack);
+      });
+    }
+    function closeModal(){
+      els.modalRoot.style.display='none';
+      els.modalRoot.setAttribute('aria-hidden','true');
+    }
 
-  const apiInput=document.getElementById('apiInput');const secretInput=document.getElementById('secretInput');const saveCfg=document.getElementById('saveCfg');const resetCfg=document.getElementById('resetCfg');apiInput.value=store.api;secretInput.value=store.secret;saveCfg.onclick=()=>{store.api=apiInput.value.trim().replace(/\/+$/,'');store.secret=secretInput.value.trim();toast('Saved')};resetCfg.onclick=()=>{store.reset();apiInput.value=store.api;secretInput.value=store.secret;toast('Reset')}
+    async function confirmDialog(msg,sub=''){
+      const html=`<div class="stack"><div>${msg}</div>${sub?`<div class="muted">${sub}</div>`:''}</div>`;
+      const id=await openModal({
+        title:'Please confirm',
+        html,
+        buttons:[
+          {id:'cancel',label:'Cancel',variant:'btn-ghost'},
+          {id:'ok',label:'Confirm'}
+        ]
+      });
+      return id==='ok';
+    }
 
-  const ownerEl=document.getElementById('owner');const countEl=document.getElementById('count');const keyvalEl=document.getElementById('keyval');const newownerEl=document.getElementById('newowner');const searchEl=document.getElementById('search');const statusFilterEl=document.getElementById('statusFilter');
+    function keysPopup(owner,keys){
+      const list=keys.map(k=>`
+        <div class="kitem">
+          <span class="kkey" data-copy="${k}">${k}</span>
+          <button class="btn-rim-small" data-copybtn="${k}">Copy</button>
+        </div>`).join('');
+      const html=`<div class="stack"><div><b>Owner:</b> ${owner}</div><div class="klist">${list}</div></div>`;
+      openModal({title:'Keys generated',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});
+      const h=async e=>{
+        const cell=e.target.closest('[data-copy]');
+        const btn=e.target.closest('[data-copybtn]');
+        const val=cell?.dataset.copy||btn?.dataset.copybtn;
+        if(val){
+          try{ await navigator.clipboard.writeText(val); toast('Copied'); }
+          catch{ toast('Copy failed'); }
+        }
+      };
+      els.mContent.addEventListener('click',h,{once:true});
+    }
 
-  async function loadKeys(){els.keysBox.textContent='Loading…';try{const j=await apiFetch('/keys');allKeys=j.keys||[];renderKeys()}catch{els.keysBox.textContent='Failed to load keys'}}
-  let allKeys=[]
-  function renderKeys(){const q=(searchEl.value||'').toLowerCase();const filt=statusFilterEl.value;const rows=allKeys.filter(k=>{const text=`${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();if(q&&!text.includes(q))return false;const rev=(k.status||'').toLowerCase().includes('revok');if(filt==='active'&&rev)return false;if(filt==='revoked'&&!rev)return false;return true}).map(k=>`<tr class="key-row ${(k.status||'').toLowerCase().includes('revok')?'rev':''}"><td style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all" data-copy="${k.key}">${k.key}</td><td>${k.owner||''}</td><td>${(k.status||'').toLowerCase().includes('revok')?'<span class="badge b-bad">REVOKED</span>':'<span class="badge b-ok">ACTIVE</span>'}</td><td class="right">${(k.status||'').toLowerCase().includes('revok')?`<button class="btn-rim-small" data-row-unrevoke="${k.key}">Unrevoke</button>`:`<button class="btn-danger" data-row-revoke="${k.key}">Revoke</button>`}<button class="btn-ghost" data-row-del="${k.key}">Delete</button></td></tr>`).join('');els.keysBox.innerHTML=`<table class="table"><thead><tr><th>Key</th><th>Owner</th><th>Status</th><th class="right">Actions</th></tr></thead><tbody>${rows}</tbody></table>`}
+    function keyAddedPopup(owner,key){
+      const html=`<div class="stack">
+        <div><b>Owner:</b> ${owner}</div>
+        <div class="kitem">
+          <span class="kkey" data-copy="${key}">${key}</span>
+          <button class="btn-rim-small" data-copybtn="${key}">Copy</button>
+        </div>
+      </div>`;
+      openModal({title:'Key added',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});
+      const h=async e=>{
+        const cell=e.target.closest('[data-copy]');
+        const btn=e.target.closest('[data-copybtn]');
+        const val=cell?.dataset.copy||btn?.dataset.copybtn;
+        if(val){
+          try{ await navigator.clipboard.writeText(val); toast('Copied'); }
+          catch{ toast('Copy failed'); }
+        }
+      };
+      els.mContent.addEventListener('click',h,{once:true});
+    }
 
-  els.keysBox.addEventListener('click',async e=>{const t=e.target;const revoke=t.closest('[data-row-revoke]');const unrevoke=t.closest('[data-row-unrevoke]');const del=t.closest('[data-row-del]');const copy=t.closest('[data-copy]');if(revoke){const ok=await confirmDialog('Revoke this key?','Users will be blocked until unrevoked.');if(ok)await doAction('/keys/revoke',{key:revoke.dataset.rowRevoke});return}if(unrevoke){const ok=await confirmDialog('Unrevoke this key?','Access will be restored.');if(ok)await doAction('/keys/unrevoke',{key:unrevoke.dataset.rowUnrevoke});return}if(del){const ok=await confirmDialog('Delete this key?','Permanent removal.');if(ok)await doAction('/keys/delete',{key:del.dataset.rowDel});return}if(copy){try{await navigator.clipboard.writeText(copy.dataset.copy);toast('Key copied')}catch{toast('Copy failed')}}})
+    function setBadge(el,up){
+      el.textContent=up?'ONLINE':'OFFLINE';
+      el.className='badge '+(up?'b-ok':'b-bad');
+    }
+    function setDot(el,up){
+      el.className='dot '+(up?'ok':'bad');
+    }
+    const apiBase=()=> (store.api||'').replace(/\/+$/,'');
 
-  document.getElementById('btnGen').onclick=async()=>{const owner=(ownerEl.value||'manual').trim();const n=Math.max(1,Math.min(100,parseInt(countEl.value||'1')));const res=await doAction('/keys/generate',{n,owner});const keys=(res&&Array.isArray(res.created))?res.created:[];if(keys.length){keysPopup(owner,keys)}else{toast('No keys returned')}}
-  document.getElementById('btnAdd').onclick=async()=>{const key=(keyvalEl.value||'').trim().toLowerCase();if(!key){toast('Enter a key');return}const owner=(newownerEl.value||'manual').trim();await doAction('/keys/add',{key,owner});keyAddedPopup(owner,key)}
-  document.getElementById('btnRefresh').onclick=()=>loadKeys()
-  searchEl?.addEventListener('input',renderKeys);statusFilterEl?.addEventListener('change',renderKeys)
+    async function apiFetch(path,opts={}){
+      const init={
+        method:'GET',
+        headers:{'X-Panel-Secret':store.secret,'Content-Type':'application/json'},
+        ...opts
+      };
+      const url=apiBase()+path;
+      const r=await fetch(url,init);
+      if(!r.ok){
+        const t=await r.text().catch(()=>String(r.status));
+        throw new Error(`${r.status} ${t.slice(0,200)}`);
+      }
+      const ct=r.headers.get('content-type')||'';
+      return ct.includes('application/json')?r.json():r.text();
+    }
 
-  refresh();loadKeys();setInterval(refresh,4000)
-</script>
+    async function doAction(path,body){
+      els.msg.textContent='Working…';
+      try{
+        const res=await apiFetch(path,{method:'POST',body:body?JSON.stringify(body):undefined});
+        els.msg.textContent=typeof res==='string'?res:'Done';
+        toast('Success');
+        await refresh();
+        if(path.startsWith('/keys')) loadKeys();
+        return res;
+      }catch(e){
+        els.msg.textContent=`Error: ${e.message}`;
+        toast('Failed');
+        throw e;
+      }
+    }
+
+    async function refresh(){
+      try{
+        const j=await apiFetch('/status');
+        setBadge(els.c,!!j.cronix);
+        setDot(els.dotC,!!j.cronix);
+        els.lastRefresh.textContent='Updated '+new Date().toLocaleTimeString();
+        els.msg.textContent='Ready';
+      }catch(e){
+        setBadge(els.c,false);
+        setDot(els.dotC,false);
+        els.msg.textContent='Status error';
+      }
+    }
+
+    document.addEventListener('click',async e=>{
+      const b=e.target.closest('button[data-act]');
+      if(!b) return;
+      const path=b.dataset.act;
+      if(b.dataset.confirm){
+        const ok=await confirmDialog(b.dataset.confirm);
+        if(!ok) return;
+      }
+      doAction(path);
+    });
+
+    // Config form
+    const apiInput=document.getElementById('apiInput');
+    const secretInput=document.getElementById('secretInput');
+    const saveCfg=document.getElementById('saveCfg');
+    const resetCfg=document.getElementById('resetCfg');
+    apiInput.value=store.api;
+    secretInput.value=store.secret;
+    saveCfg.onclick=()=>{
+      store.api=apiInput.value.trim().replace(/\/+$/,'');
+      store.secret=secretInput.value.trim();
+      toast('Saved');
+    };
+    resetCfg.onclick=()=>{
+      store.reset();
+      apiInput.value=store.api;
+      secretInput.value=store.secret;
+      toast('Reset');
+    };
+
+    // Keys list
+    const ownerEl=document.getElementById('owner');
+    const countEl=document.getElementById('count');
+    const keyvalEl=document.getElementById('keyval');
+    const newownerEl=document.getElementById('newowner');
+    const searchEl=document.getElementById('search');
+    const statusFilterEl=document.getElementById('statusFilter');
+
+    async function loadKeys(){
+      els.keysBox.textContent='Loading…';
+      try{
+        const j=await apiFetch('/keys');
+        allKeys=j.keys||[];
+        renderKeys();
+      }catch{
+        els.keysBox.textContent='Failed to load keys';
+      }
+    }
+
+    let allKeys=[];
+    function renderKeys(){
+      const q=(searchEl.value||'').toLowerCase();
+      const filt=statusFilterEl.value;
+      const rows=allKeys
+        .filter(k=>{
+          const text=`${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();
+          if(q && !text.includes(q)) return false;
+          const rev=(k.status||'').toLowerCase().includes('revok');
+          if(filt==='active'&&rev) return false;
+          if(filt==='revoked'&&!rev) return false;
+          return true;
+        })
+        .map(k=>`
+          <tr class="key-row ${(k.status||'').toLowerCase().includes('revok')?'rev':''}">
+            <td style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all" data-copy="${k.key}">${k.key}</td>
+            <td>${k.owner||''}</td>
+            <td>${(k.status||'').toLowerCase().includes('revok')
+              ?'<span class="badge b-bad">REVOKED</span>'
+              :'<span class="badge b-ok">ACTIVE</span>'}
+            </td>
+            <td class="right">
+              ${(k.status||'').toLowerCase().includes('revok')
+                ?`<button class="btn-rim-small" data-row-unrevoke="${k.key}">Unrevoke</button>`
+                :`<button class="btn-danger" data-row-revoke="${k.key}">Revoke</button>`}
+              <button class="btn-ghost" data-row-del="${k.key}">Delete</button>
+            </td>
+          </tr>`).join('');
+
+      els.keysBox.innerHTML=`
+        <table class="table">
+          <thead>
+            <tr><th>Key</th><th>Owner</th><th>Status</th><th class="right">Actions</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    els.keysBox.addEventListener('click',async e=>{
+      const t=e.target;
+      const revoke=t.closest('[data-row-revoke]');
+      const unrevoke=t.closest('[data-row-unrevoke]');
+      const del=t.closest('[data-row-del]');
+      const copy=t.closest('[data-copy]');
+
+      if(revoke){
+        const ok=await confirmDialog('Revoke this key?','Users will be blocked until unrevoked.');
+        if(ok) await doAction('/keys/revoke',{key:revoke.dataset.rowRevoke});
+        return;
+      }
+      if(unrevoke){
+        const ok=await confirmDialog('Unrevoke this key?','Access will be restored.');
+        if(ok) await doAction('/keys/unrevoke',{key:unrevoke.dataset.rowUnrevoke});
+        return;
+      }
+      if(del){
+        const ok=await confirmDialog('Delete this key?','Permanent removal.');
+        if(ok) await doAction('/keys/delete',{key:del.dataset.rowDel});
+        return;
+      }
+      if(copy){
+        try{ await navigator.clipboard.writeText(copy.dataset.copy); toast('Key copied'); }
+        catch{ toast('Copy failed'); }
+      }
+    });
+
+    document.getElementById('btnGen').onclick=async()=>{
+      const owner=(ownerEl.value||'manual').trim();
+      const n=Math.max(1,Math.min(100,parseInt(countEl.value||'1')));
+      const res=await doAction('/keys/generate',{n,owner});
+      const keys=(res&&Array.isArray(res.created))?res.created:[];
+      if(keys.length){ keysPopup(owner,keys); } else { toast('No keys returned'); }
+    };
+
+    document.getElementById('btnAdd').onclick=async()=>{
+      const key=(keyvalEl.value||'').trim().toLowerCase();
+      if(!key){ toast('Enter a key'); return; }
+      const owner=(newownerEl.value||'manual').trim();
+      await doAction('/keys/add',{key,owner});
+      keyAddedPopup(owner,key);
+    };
+
+    document.getElementById('btnRefresh').onclick=()=>loadKeys();
+    searchEl?.addEventListener('input',renderKeys);
+    statusFilterEl?.addEventListener('change',renderKeys);
+
+    // Embers
+    const emberCount=30;
+    for(let i=0;i<emberCount;i++){
+      const ember=document.createElement("div");
+      ember.className="ember";
+      ember.style.left=Math.random()*100+"vw";
+      ember.style.animationDuration=6+Math.random()*6+"s";
+      ember.style.animationDelay=Math.random()*8+"s";
+      document.body.appendChild(ember);
+    }
+
+    // Init
+    refresh(); loadKeys(); setInterval(refresh,4000);
+  </script>
+</body>
+</html>
