@@ -2,663 +2,640 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CRONIX — Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CRONIX Admin Panel</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap');
 
-    /* ====== Global / Theme (from Code 1 vibe) ====== */
+    /* ===== Muted dark theme + fix native dropdown/controls ===== */
     :root{
-      --bg0:#000;
-      --bg1:#0b0000;
-      --panel:#140000;
-      --panel-weak:#150000cc;
-      --border:#220000;
-      --border-strong:#2d0000;
-      --text:#eee;
-      --muted:#bbb;
-      --accent:#ff2424;
-      --accent-deep:#8b0000;
-      --accent-faint:rgba(255,36,36,.15);
-      --shadow:0 10px 24px rgba(0,0,0,.35);
-      --ok:#14351a; --ok-text:#65e077;
-      --bad:#3a1414; --bad-text:#ff8a8a;
-      --btn:#1a0000; --btn-hover:#230000;
+      color-scheme: dark;
+      --bg0:#050505; --bg1:#0a0606;
+      --panel:#120606;
+      --border:#1c0b0b; --border-strong:#2a0e0e;
+      --text:#e7e7e7; --muted:#a8a8a8;
+      --accent:#e02b2b;
+      --accent-deep:#5e0f0f;
+      --ok:#16331d; --ok-text:#58d46a;
+      --bad:#361919; --bad-text:#ff8a8a;
+      --btn:#140909; --btn-hover:#1a0c0c;
+      --shadow:0 10px 24px rgba(0,0,0,.25);
+      --safe:env(safe-area-inset-bottom,0px);
+      --radius:16px;
+      --focus:#6a2323;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;
-      font-family:'Orbitron',system-ui,Segoe UI,Arial;
+      margin:0; font-family:'Orbitron',system-ui,Segoe UI,Arial;
       color:var(--text);
       background:linear-gradient(180deg,var(--bg0) 0%, var(--bg1) 100%);
-      line-height:1.5;
-      overflow-x:hidden;
+      line-height:1.5; overflow-x:hidden;
+      -webkit-tap-highlight-color: transparent;
+      color-scheme: dark;
     }
-    .glow-red { text-shadow:0 0 8px var(--accent), 0 0 20px var(--accent); }
+    .soft-glow{ text-shadow:0 0 4px rgba(224,43,43,.25); }
 
-    /* ====== HERO ====== */
+    /* ===== HERO ===== */
     header.hero{
-      padding:60px 5% 40px;
-      background:radial-gradient(circle at center, #150000 0%, #000 80%);
+      padding:48px 5% 28px;
+      background:
+        radial-gradient(1200px 450px at 50% -10%, rgba(224,43,43,.08), transparent 65%),
+        radial-gradient(700px 300px at 50% 120%, rgba(224,43,43,.06), transparent 70%),
+        linear-gradient(180deg,#090707 0%, #060404 100%);
       display:flex; flex-direction:column; align-items:center; text-align:center;
-      position:relative; overflow:hidden; border-radius:0 0 40px 40px;
-    }
-    header.hero::before{
-      content:""; position:absolute; inset:-50%;
-      background:radial-gradient(circle, rgba(255,36,36,.15) 0%, transparent 60%);
-      animation:pulse 6s infinite;
-    }
-    @keyframes pulse{
-      0%,100%{ transform:scale(1); opacity:.6; }
-      50%{ transform:scale(1.2); opacity:.2; }
+      position:relative; overflow:hidden; border-radius:0 0 var(--radius) var(--radius);
     }
     .logo{
-      width:180px; height:180px;
+      width:140px;height:140px;
       background:url('https://i.postimg.cc/MHff0dQQ/cronix.webp') no-repeat center/cover;
       border-radius:50%;
-      filter:drop-shadow(0 0 25px var(--accent));
-      margin-bottom:18px; position:relative; z-index:2; animation:eyePulse 4s infinite;
+      filter:drop-shadow(0 0 10px rgba(224,43,43,.25));
+      margin-bottom:12px;
     }
-    @keyframes eyePulse{
-      0%,100%{ filter:drop-shadow(0 0 25px var(--accent)); }
-      50%{ filter:drop-shadow(0 0 50px #ff4444); }
-    }
-    header.hero h1{ font-size:2.6rem; margin:8px 0 6px; position:relative; z-index:2; }
-    header.hero p{ color:#bbb; margin:0; position:relative; z-index:2; font-size:1.05rem; }
+    header.hero h1{font-size:2rem;margin:6px 0 4px}
+    header.hero p{color:var(--muted);margin:0;font-size:.95rem}
 
-    /* ====== Sheet / Card ====== */
-    .sheet{ max-width:1000px; margin:26px auto; padding:0 14px; }
+    /* ===== SHELL ===== */
+    .sheet{max-width:1000px;margin:22px auto;padding:0 14px}
     .card{
-      background:rgba(20,0,0,.85);
-      border:1px solid var(--border);
-      border-radius:20px;
+      background:linear-gradient(180deg, rgba(18,6,6,.9), rgba(12,5,5,.9));
+      border:1px solid var(--border);               /* FIX: visible outer border */
+      border-radius:calc(var(--radius) + 2px);
       box-shadow:var(--shadow);
       overflow:hidden;
+      position:relative;                             /* FIX: keep ::before inside */
+    }
+    .card::before{                                   /* subtle inner+outer rim */
+      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+      box-shadow:
+        0 0 0 1px rgba(224,43,43,.15),
+        inset 0 0 0 1px rgba(224,43,43,.06);
     }
 
-    /* Conic red-black rim like Code 2 but themed */
-    @property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
-    @keyframes spin{to{--a:360deg}}
-    .card-rim{
-      --r:20px;
-      position:relative; border-radius:var(--r);
-      background:
-        linear-gradient(var(--panel),var(--panel)) padding-box,
-        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
-      border:2px solid transparent;
-      animation:spin 8s linear infinite;
-    }
-
-    /* Sticky header inside card */
     .hdr{
       position:sticky; top:0; z-index:5;
-      background:linear-gradient(180deg,rgba(16,0,0,.95),rgba(16,0,0,.8));
-      backdrop-filter:blur(6px);
+      background:linear-gradient(180deg,rgba(10,6,6,.92),rgba(10,6,6,.86));
       border-bottom:1px solid var(--border);
       padding:14px 16px;
+      display:grid; gap:8px;
+      backdrop-filter:saturate(1.1) blur(2px);
     }
-    .title{ display:flex; align-items:center; gap:10px; font-weight:800; }
-    .sub{ color:var(--muted); font-size:12px; }
-
-    /* Pills / Badges */
-    .row{ display:flex; gap:10px; flex-wrap:wrap; }
-    .right{ margin-left:auto; }
+    .title{display:flex;align-items:center;gap:10px;font-weight:800}
+    .sub{color:var(--muted);font-size:12px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
     .pill{
       border:1px solid var(--border);
-      padding:8px 12px;
-      border-radius:999px;
-      display:inline-flex; align-items:center; gap:8px;
-      background:rgba(20,0,0,.5);
+      padding:8px 12px;border-radius:999px;
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.02);
     }
-    .dot{width:8px; height:8px; border-radius:50%}
-    .ok{background:#22c55e} .bad{background:#ef4444}
-    .badge{padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; border:1px solid var(--border)}
-    .b-ok{background:var(--ok); color:var(--ok-text)}
-    .b-bad{background:var(--bad); color:var(--bad-text)}
-    .muted{ color:var(--muted); }
+    .dot{width:8px;height:8px;border-radius:50%}.ok{background:#22c55e}.bad{background:#ef4444}
+    .badge{padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;border:1px solid var(--border)}
+    .b-ok{background:var(--ok);color:var(--ok-text)} .b-bad{background:var(--bad);color:var(--bad-text)}
+    .muted{color:var(--muted)}
+    .right{margin-left:auto}
+    .ta-right{text-align:right}                      /* FIX: for table header/cells */
 
-    /* Body / Sections */
-    .body{ padding:16px; }
-    .section{ padding:14px 0; border-bottom:1px dashed var(--border); }
-    .section:last-child{ border-bottom:none; }
-    .stack{ display:flex; flex-direction:column; gap:10px; }
+    .body{padding:16px}
+    .section{padding:14px 0;border-bottom:1px dashed var(--border)} .section:last-child{border-bottom:none}
+    .stack{display:flex;flex-direction:column;gap:10px}
 
-    /* Buttons & Inputs (Code 1 glow + Code 2 rim) */
+    /* ===== Controls ===== */
     input,button,select{
-      background:var(--btn);
-      border:1px solid var(--border-strong);
-      color:var(--text);
-      padding:12px 14px;
-      border-radius:14px;
-      min-height:44px;
-      font-weight:800;
+      background:var(--btn); border:1px solid var(--border-strong); color:var(--text);
+      padding:12px 14px; border-radius:12px; min-height:44px; font-weight:800;
+      box-shadow:inset 0 -1px 0 rgba(255,255,255,.03);
+      outline:none;
     }
-    .btn{ 
+    input:focus, select:focus, button:focus{
+      border-color:var(--focus);
+      box-shadow:0 0 0 2px rgba(224,43,43,.15) inset; /* FIX: consistent focus ring */
+    }
+
+    /* FIX: dark native dropdowns (no white popup in menus) */
+    select{
+      appearance:none; -webkit-appearance:none; -moz-appearance:none;
+      background:var(--btn) !important;
+      color:var(--text) !important;
+      background-image:none;
+      border-color:var(--border-strong);
+    }
+    option{ background:#0f0a0a !important; color:var(--text) !important; }
+    select::-ms-expand{ display:none; }              /* old IE arrow */
+    /* Number spinners */
+    input[type=number]{-moz-appearance:textfield}
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0 }
+
+    .btn{
       display:inline-block; cursor:pointer; text-decoration:none; text-align:center;
-      border-radius:40px; background:var(--accent); color:#fff;
-      box-shadow:0 0 12px var(--accent), inset 0 0 8px var(--accent-deep);
-      transition:.25s;
+      border-radius:12px; background:linear-gradient(180deg, #251010, #1a0c0c);
+      color:#fff; border:1px solid #3a1212; transition:.2s;
     }
-    .btn:hover{ background:var(--accent-deep); box-shadow:0 0 18px #ff4444; }
-    .btn:active{ transform:scale(.98); }
+    .btn:hover{filter:brightness(1.04)}
+    .btn:active{transform:translateY(1px)}
+    .btn-ghost{background:transparent;border-color:var(--border-strong)}
+    .btn-danger{background:linear-gradient(180deg, #3a1515, #2a1010); border-color:#6a2323}
+    .btn-danger:hover{filter:brightness(1.03)}
+    .btn-rim{ background:linear-gradient(180deg,#211010,#180c0c); border:1px solid rgba(224,43,43,.35); }
 
-    .btn-ghost{ background:transparent; border-color:var(--border-strong); }
-    .btn-danger{ background:#2c0000; border-color:#ff0000; }
-    .btn-danger:hover{ background:#3d0000; }
+    .dock{
+      position:sticky; bottom:0; z-index:6; padding:10px 14px calc(10px + var(--safe));
+      background:linear-gradient(180deg,rgba(10,6,6,0),rgba(10,6,6,.9) 28%);
+      display:none; gap:8px; backdrop-filter:blur(2px);
+      border-top:1px solid var(--border);           /* FIX: clear top edge */
+    }
+    .dock .btn, .dock .btn-rim, .dock .btn-danger{flex:1; min-height:48px}
 
-    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; }
-    .btn-rim{
-      --border-w:2px; border:var(--border-w) solid transparent; border-radius:14px;
-      color:var(--text);
-      background:
-        linear-gradient(var(--btn),var(--btn)) padding-box,
-        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
-      animation:spin 4s linear infinite;
-      padding:12px 16px;
+    /* ===== Table ===== */
+    .scroll-x{overflow:auto}
+    .table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px}
+    .table th,.table td{
+      padding:10px;
+      border-bottom:1px solid var(--border);         /* FIX: consistent row separators */
+      vertical-align:middle;
     }
-    .btn-rim:hover{
-      background:
-        linear-gradient(var(--btn-hover),var(--btn-hover)) padding-box,
-        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
-    }
-    .btn-rim-small{
-      --border-w:2px; border:var(--border-w) solid transparent; border-radius:10px;
-      background:
-        linear-gradient(var(--btn),var(--btn)) padding-box,
-        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
-      animation:spin 4s linear infinite;
-      padding:8px 12px; color:var(--text);
-      font-weight:800;
-    }
+    .table th{ text-align:left;color:var(--muted);font-weight:800 }
+    .key-row.rev{background:linear-gradient(0deg, rgba(224,43,43,.06), rgba(224,43,43,.06))}
+    .cell-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}
 
-    .rim-focus:focus{
-      outline:none; border-color:transparent;
-      background:
-        linear-gradient(var(--btn),var(--btn)) padding-box,
-        conic-gradient(from var(--a), var(--accent), var(--accent-deep), #000000, var(--accent)) border-box;
-      animation:spin 6s linear infinite;
-    }
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:#0f0a0a;font-weight:800}
+    .pager{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .pager button{min-width:44px}
 
-    /* Keys table */
-    .table{ width:100%; border-collapse:collapse; margin-top:10px; }
-    .table th,.table td{ padding:10px; border-bottom:1px solid var(--border); }
-    .table th{ text-align:left; color:var(--muted); font-weight:800; }
-    .key-row.rev{ background:linear-gradient(0deg, rgba(255,77,77,.08), rgba(255,77,77,.08)); }
-
-    /* Modal + Toast styled like Code 1 */
-    .toast{
-      position:fixed; left:50%; transform:translateX(-50%);
-      bottom:18px; background:#110000; border:1px solid var(--border);
-      padding:10px 14px; border-radius:12px; box-shadow:var(--shadow);
-      opacity:0; pointer-events:none; transition:opacity .2s, bottom .2s; z-index:50;
-      text-shadow:0 0 8px var(--accent), 0 0 12px var(--accent);
+    /* ===== Mobile ===== */
+    @media (max-width:860px){
+      .row.stack-m{flex-direction:column}
+      .row.stack-m > *{width:100%}
     }
-    .toast.show{ opacity:1; pointer-events:auto; bottom:24px; }
-
-    .modal-backdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(3px);
-      display:none; align-items:center; justify-content:center; z-index:60; padding:16px;
-    }
-    .modal{
-      max-width:560px; width:100%; background:rgba(20,0,0,.9);
-      border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow); overflow:hidden;
-    }
-    .modal header{ padding:14px 16px; border-bottom:1px solid var(--border); font-weight:800; }
-    .modal .content{ padding:14px 16px; }
-    .modal footer{ padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-    .modal .klist{ display:flex; flex-direction:column; gap:8px; }
-    .modal .kitem{ display:flex; gap:8px; align-items:center; }
-    .modal .kkey{
-      flex:1; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; word-break:break-all;
-      border:1px dashed var(--border); border-radius:10px; padding:8px 10px; background:#0f0000;
-    }
-
-    /* Embers (from Code 1) */
-    .ember{
-      position:fixed; width:4px; height:4px; background:var(--accent);
-      border-radius:50%; box-shadow:0 0 8px var(--accent);
-      opacity:.7; pointer-events:none; animation:float 8s linear infinite;
-    }
-    @keyframes float{
-      from{ transform:translateY(100vh) scale(.5); opacity:.8; }
-      to{ transform:translateY(-10vh) scale(1.5); opacity:0; }
-    }
-
-    /* Details summary styling (themed) */
-    details{ border:1px solid var(--border); border-radius:16px; background:rgba(20,0,0,.5); }
-    details[open]{ background:rgba(20,0,0,.75); }
-    details summary{
-      cursor:pointer; padding:12px 14px; font-weight:800; color:var(--accent);
-      list-style:none; border-bottom:1px solid var(--border);
-    }
-    details summary::-webkit-details-marker{ display:none; }
-    details .details-body{ padding:12px 14px; }
-
-    /* Responsive tweaks */
-    @media (max-width:420px){
-      .toolbar button{ flex:1 1 47%; }
-      .row input,.row select{ flex:1 1 47%; }
+    @media (max-width:760px){
+      header.hero h1{font-size:1.7rem}
+      .toolbar{display:none}
+      .dock{display:flex}
+      .table th:nth-child(2), .table td:nth-child(2){display:none}
     }
   </style>
 </head>
 <body>
-  <!-- ===== HERO ===== -->
   <header class="hero">
     <div class="logo"></div>
-    <h1 class="glow-red">CRONIX Admin Panel</h1>
-    <p>Manage keys, control the service, and monitor status — all in one premium panel.</p>
+    <h1 class="soft-glow">CRONIX Admin Panel</h1>
+    <p>Manage keys & control Cronix's backend.</p>
   </header>
 
-  <!-- ===== PANEL ===== -->
   <div class="sheet">
-    <div class="card card-rim" role="region" aria-label="Cronix One-Page Panel">
+    <div class="card" role="region" aria-label="Cronix One-Page Panel">
       <div class="hdr">
         <div class="title">Control Center <span class="sub" id="lastRefresh">—</span></div>
-        <div class="row" style="margin-top:8px">
-          <span class="pill">Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-bad">OFFLINE</span></span>
+
+        <div class="row">
+          <span class="pill">
+            Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-bad">OFFLINE</span>
+          </span>
+          <span class="pill"><span id="counts" class="muted">Total 0 • Active 0 • Revoked 0</span></span>
           <span class="pill right"><span id="msg" class="muted">Ready</span></span>
         </div>
-      </div>
 
-      <div class="body">
-        <!-- Actions -->
-        <section class="section">
-          <div class="toolbar">
-            <button data-act="/start" class="btn-rim">Start Cronix</button>
-            <button data-act="/stop" class="btn-danger" data-confirm="Stop Cronix?">Stop Cronix</button>
-          </div>
-          <div class="muted" style="margin-top:8px"><b>Made by: Zenyical</b>.</div>
-        </section>
-
-        <!-- Settings -->
-        <section class="section">
-          <details>
-            <summary>Settings — API &amp; Token (DONT TOUCH)</summary>
-            <div class="details-body stack">
-              <label>API Base URL
-                <input id="apiInput" class="rim-focus" placeholder="https://your-ngrok-host.ngrok.app" />
-              </label>
-              <label>Panel Secret
-                <input id="secretInput" class="rim-focus" placeholder="••••••••" />
-              </label>
-              <div class="row">
-                <button id="saveCfg" class="btn-rim">Save</button>
-                <button id="resetCfg" class="btn-ghost">Reset to Default</button>
-                <span class="muted">Saved only in this browser.</span>
-              </div>
-            </div>
-          </details>
-        </section>
-
-        <!-- Keys -->
-        <section class="section" aria-label="Keys Manager">
-          <h3 style="margin:0 0 8px; color:var(--accent)">Keys</h3>
-          <div class="row">
-            <input id="owner" class="rim-focus" placeholder="Owner name (e.g. Timmy123)" />
-            <input id="count" class="rim-focus" type="number" value="1" min="1" max="100" style="width:120px" />
-            <button id="btnGen" class="btn-rim">Generate Keys</button>
-          </div>
-          <div class="row" style="margin-top:8px">
-            <input id="keyval" class="rim-focus" placeholder="Paste a key (lowercase)" style="flex:1" />
-            <input id="newowner" class="rim-focus" placeholder="Owner for this key" style="width:220px" />
-            <button id="btnAdd" class="btn-rim">Add Key</button>
-          </div>
-          <div class="row" style="margin-top:8px">
-            <input id="search" class="rim-focus" placeholder="Search key or owner…" style="flex:1" />
-            <select id="statusFilter" class="rim-focus" title="Filter">
+        <div class="row stack-m">
+          <input id="search" placeholder="Search (/ to focus)…" style="flex:1" />
+          <div class="row" style="gap:10px">
+            <select id="statusFilter" title="Filter">
               <option value="all">All</option>
               <option value="active">Active</option>
               <option value="revoked">Revoked</option>
             </select>
-            <button id="btnRefresh" class="btn-rim">Refresh List</button>
+            <select id="sortSel" title="Sort">
+              <option value="owner,key,asc">Owner A→Z (default)</option>
+              <option value="key,asc">Key A→Z</option>
+              <option value="status,asc">Status A→Z</option>
+            </select>
+            <select id="pageSize" title="Page size">
+              <option>10</option><option selected>25</option><option>50</option><option>100</option>
+            </select>
+            <label class="pill" style="gap:6px">
+              <input id="autoRefresh" type="checkbox" style="width:18px;height:18px"> Auto-refresh
+            </label>
           </div>
-          <div class="muted">Tap a key to copy. Red rows = revoked.</div>
-          <div id="keys" style="margin-top:8px">Loading…</div>
+        </div>
+
+        <div class="row stack-m">
+          <div class="chips" id="chips"></div>
+          <span class="right" style="display:flex;gap:10px">
+            <button id="exportCsv" class="btn-rim">Export CSV</button>
+            <input id="importCsv" type="file" accept=".csv" style="display:none">
+            <button id="importCsvBtn" class="btn-ghost">Import CSV</button>
+          </span>
+        </div>
+
+        <div class="row">
+          <div class="toolbar" style="gap:10px">
+            <button data-act="/start" class="btn-rim">Start</button>
+            <button data-act="/stop" class="btn-danger" data-confirm="Stop Cronix?">Stop</button>
+            <button id="copyAll" class="btn">Copy all keys</button>
+            <button id="refreshBtn" class="btn-ghost">Refresh</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="body">
+        <section class="section" aria-label="Keys Manager">
+          <h3 style="margin:0 0 8px;color:#d14a4a">Keys</h3>
+
+          <div class="row" style="gap:8px;margin-bottom:8px">
+            <button id="bulkRevoke" class="btn-danger">Revoke selected</button>
+            <button id="bulkUnrevoke" class="btn-rim">Unrevoke selected</button>
+            <button id="bulkDelete" class="btn-ghost">Delete selected</button>
+            <span class="muted" id="selCount">0 selected</span>
+          </div>
+
+          <div class="row stack-m">
+            <input id="owner" placeholder="Owner name (e.g. Timmy123)" />
+            <input id="count" type="number" value="1" min="1" max="100" style="width:120px" />
+            <button id="btnGen" class="btn-rim">Generate Keys</button>
+          </div>
+          <div class="row stack-m" style="margin-top:8px">
+            <input id="keyval" placeholder="Paste a key (lowercase)" style="flex:1" />
+            <input id="newowner" placeholder="Owner for this key" style="width:220px" />
+            <button id="btnAdd" class="btn-rim">Add Key</button>
+          </div>
+
+          <div id="keys" class="scroll-x" style="margin-top:10px">
+            <div style="height:140px;border:1px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Loading…</div>
+          </div>
+
+          <div class="pager">
+            <button id="prevPage" class="btn-ghost">◀</button>
+            <span id="pageInfo" class="muted">Page 1/1</span>
+            <button id="nextPage" class="btn-ghost">▶</button>
+          </div>
         </section>
+
+        <section class="section">
+          <h3 style="margin:0 0 8px;color:#d14a4a">Activity</h3>
+          <div id="activity" class="stack muted"></div>
+        </section>
+      </div>
+
+      <div class="dock">
+        <button data-act="/start" class="btn-rim">Start</button>
+        <button id="refreshBtn2" class="btn-ghost">Refresh</button>
+        <button data-act="/stop" class="btn-danger">Stop</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== Modal / Toast ===== -->
-  <div id="modalRoot" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document" aria-labelledby="mTitle" aria-describedby="mContent">
-      <header id="mTitle">Dialog</header>
-      <div id="mContent" class="content">…</div>
-      <footer id="mFooter"></footer>
-    </div>
-  </div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- Minimal toast -->
+  <div id="toast" role="status" aria-live="polite" style="
+    position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
+    background:#0f0a0a;border:1px solid var(--border);
+    padding:10px 14px;border-radius:10px;box-shadow:var(--shadow);
+    opacity:0;pointer-events:none;transition:opacity .18s,bottom .18s;z-index:50;color:var(--text)
+  "></div>
 
-  <!-- ===== JS (all Code 2 functionality intact) ===== -->
+  <!-- Modal host -->
+  <div id="modalRoot" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);align-items:center;justify-content:center;z-index:60;"></div>
+
   <script>
-    // Defaults & storage
+    /* ================== Logic ================== */
+
     const DEFAULTS={API:"https://9ed41e73e5f8.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
-    const store={
-      get api(){return localStorage.getItem('cronix_api')||DEFAULTS.API},
-      set api(v){localStorage.setItem('cronix_api',v)},
-      get secret(){return localStorage.getItem('cronix_secret')||DEFAULTS.SECRET},
-      set secret(v){localStorage.setItem('cronix_secret',v)},
-      reset(){localStorage.removeItem('cronix_api');localStorage.removeItem('cronix_secret')}
+    const store={ g:k=>localStorage.getItem(k), s:(k,v)=>localStorage.setItem(k,v) };
+    const pref={
+      get api(){return store.g('cronix_api')||DEFAULTS.API}, set api(v){store.s('cronix_api',v)},
+      get secret(){return store.g('cronix_secret')||DEFAULTS.SECRET}, set secret(v){store.s('cronix_secret',v)},
+      get sort(){return store.g('cronix_sort')||'owner,key,asc'}, set sort(v){store.s('cronix_sort',v)},
+      get size(){return parseInt(store.g('cronix_psize')||'25')}, set size(n){store.s('cronix_psize',String(n))},
+      get auto(){return (store.g('cronix_auto')||'0')==='1'}, set auto(b){store.s('cronix_auto',b?'1':'0')},
+      get filt(){return store.g('cronix_filt')||'all'}, set filt(v){store.s('cronix_filt',v)},
+      get query(){return store.g('cronix_q')||''}, set query(v){store.s('cronix_q',v)}
     };
 
+    const $=id=>document.getElementById(id);
     const els={
-      msg:document.getElementById('msg'),
-      c:document.getElementById('c'),
-      dotC:document.getElementById('dot-c'),
-      lastRefresh:document.getElementById('lastRefresh'),
-      toast:document.getElementById('toast'),
-      keysBox:document.getElementById('keys'),
-      modalRoot:document.getElementById('modalRoot'),
-      mTitle:document.getElementById('mTitle'),
-      mContent:document.getElementById('mContent'),
-      mFooter:document.getElementById('mFooter')
+      msg:$('msg'), c:$('c'), dotC:$('dot-c'), lastRefresh:$('lastRefresh'),
+      toast:$('toast'), keysBox:$('keys'), counts:$('counts'), chips:$('chips'),
+      pageInfo:$('pageInfo'), selCount:$('selCount'), activity:$('activity'),
+      search:$('search'), statusFilter:$('statusFilter'), sortSel:$('sortSel'),
+      pageSize:$('pageSize'), autoRefresh:$('autoRefresh'),
+      prevPage:$('prevPage'), nextPage:$('nextPage'),
+      refreshBtn:$('refreshBtn'), refreshBtn2:$('refreshBtn2'),
+      exportCsv:$('exportCsv'), importCsv:$('importCsv'), importCsvBtn:$('importCsvBtn'),
+      btnGen:$('btnGen'), btnAdd:$('btnAdd'),
+      owner:$('owner'), count:$('count'), keyval:$('keyval'), newowner:$('newowner'),
+      bulkRevoke:$('bulkRevoke'), bulkUnrevoke:$('bulkUnrevoke'), bulkDelete:$('bulkDelete'),
+      copyAll:$('copyAll'),
     };
 
-    function toast(t){
-      els.toast.textContent=t;
-      els.toast.classList.add('show');
-      setTimeout(()=>els.toast.classList.remove('show'),2000);
+    function toast(text){
+      const el=els.toast; el.textContent=text; el.style.opacity='1'; el.style.bottom='22px';
+      clearTimeout(el._t); el._t=setTimeout(()=>{el.style.opacity='0'; el.style.bottom='18px';},1800);
     }
 
-    function openModal({title='Dialog',html='',buttons=[{id:'ok',label:'OK'}]}){
-      els.mTitle.textContent=title;
-      els.mContent.innerHTML=html;
-      els.mFooter.innerHTML='';
-      buttons.forEach(b=>{
-        const x=document.createElement('button');
-        x.textContent=b.label;
-        x.className=(b.variant||'btn-rim-small');
-        x.dataset.id=b.id;
-        els.mFooter.appendChild(x);
-      });
-      els.modalRoot.style.display='flex';
-      els.modalRoot.setAttribute('aria-hidden','false');
-
-      return new Promise(res=>{
-        const onClick=e=>{
-          const t=e.target.closest('button'); if(!t) return;
-          cleanup(); closeModal(); res(t.dataset.id);
-        };
-        const onEsc=e=>{
-          if(e.key==='Escape'){ cleanup(); closeModal(); res('esc'); }
-        };
-        const onBack=e=>{
-          if(e.target===els.modalRoot){ cleanup(); closeModal(); res('backdrop'); }
-        };
-        function cleanup(){
-          els.mFooter.removeEventListener('click',onClick);
-          window.removeEventListener('keydown',onEsc);
-          els.modalRoot.removeEventListener('click',onBack);
-        }
-        els.mFooter.addEventListener('click',onClick);
-        window.addEventListener('keydown',onEsc);
-        els.modalRoot.addEventListener('click',onBack);
+    function confirmDialog(msg, sub=''){
+      return new Promise((res)=>{
+        const root=$('modalRoot');
+        root.innerHTML=`
+          <div role="document" style="max-width:520px;width:calc(100% - 32px);margin:auto;background:#140b0b;border:1px solid #1c0b0b;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.3);overflow:hidden">
+            <header style="padding:12px 14px;border-bottom:1px solid #1c0b0b;font-weight:800">Please confirm</header>
+            <div style="padding:12px 14px;color:#d8d8d8">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div>${msg}</div>${sub?`<div style="color:#9a9a9a">${sub}</div>`:''}
+              </div>
+            </div>
+            <footer style="padding:12px 14px;border-top:1px solid #1c0b0b;display:flex;gap:8px;justify-content:flex-end">
+              <button id="mCancel" class="btn-ghost">Cancel</button>
+              <button id="mOk" class="btn-rim">Confirm</button>
+            </footer>
+          </div>`;
+        root.style.display='flex'; root.setAttribute('aria-hidden','false');
+        const end=v=>{root.style.display='none'; root.innerHTML=''; res(v);};
+        root.addEventListener('click',e=>{ if(e.target===root) end(false); });
+        root.querySelector('#mCancel').onclick=()=>end(false);
+        root.querySelector('#mOk').onclick=()=>end(true);
+        window.addEventListener('keydown',function esc(ev){ if(ev.key==='Escape'){ window.removeEventListener('keydown',esc); end(false);} });
       });
     }
-    function closeModal(){
-      els.modalRoot.style.display='none';
-      els.modalRoot.setAttribute('aria-hidden','true');
-    }
 
-    async function confirmDialog(msg,sub=''){
-      const html=`<div class="stack"><div>${msg}</div>${sub?`<div class="muted">${sub}</div>`:''}</div>`;
-      const id=await openModal({
-        title:'Please confirm',
-        html,
-        buttons:[
-          {id:'cancel',label:'Cancel',variant:'btn-ghost'},
-          {id:'ok',label:'Confirm'}
-        ]
-      });
-      return id==='ok';
-    }
-
-    function keysPopup(owner,keys){
-      const list=keys.map(k=>`
-        <div class="kitem">
-          <span class="kkey" data-copy="${k}">${k}</span>
-          <button class="btn-rim-small" data-copybtn="${k}">Copy</button>
-        </div>`).join('');
-      const html=`<div class="stack"><div><b>Owner:</b> ${owner}</div><div class="klist">${list}</div></div>`;
-      openModal({title:'Keys generated',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});
-      const h=async e=>{
-        const cell=e.target.closest('[data-copy]');
-        const btn=e.target.closest('[data-copybtn]');
-        const val=cell?.dataset.copy||btn?.dataset.copybtn;
-        if(val){
-          try{ await navigator.clipboard.writeText(val); toast('Copied'); }
-          catch{ toast('Copy failed'); }
-        }
-      };
-      els.mContent.addEventListener('click',h,{once:true});
-    }
-
-    function keyAddedPopup(owner,key){
-      const html=`<div class="stack">
-        <div><b>Owner:</b> ${owner}</div>
-        <div class="kitem">
-          <span class="kkey" data-copy="${key}">${key}</span>
-          <button class="btn-rim-small" data-copybtn="${key}">Copy</button>
-        </div>
-      </div>`;
-      openModal({title:'Key added',html,buttons:[{id:'close',label:'Close'}]}).then(()=>{});
-      const h=async e=>{
-        const cell=e.target.closest('[data-copy]');
-        const btn=e.target.closest('[data-copybtn]');
-        const val=cell?.dataset.copy||btn?.dataset.copybtn;
-        if(val){
-          try{ await navigator.clipboard.writeText(val); toast('Copied'); }
-          catch{ toast('Copy failed'); }
-        }
-      };
-      els.mContent.addEventListener('click',h,{once:true});
-    }
-
-    function setBadge(el,up){
-      el.textContent=up?'ONLINE':'OFFLINE';
-      el.className='badge '+(up?'b-ok':'b-bad');
-    }
-    function setDot(el,up){
-      el.className='dot '+(up?'ok':'bad');
-    }
-    const apiBase=()=> (store.api||'').replace(/\/+$/,'');
-
+    const apiBase=()=> (pref.api||'').replace(/\/+$/,'');
     async function apiFetch(path,opts={}){
-      const init={
-        method:'GET',
-        headers:{'X-Panel-Secret':store.secret,'Content-Type':'application/json'},
-        ...opts
-      };
+      const init={method:'GET',headers:{'X-Panel-Secret':pref.secret,'Content-Type':'application/json'},...opts};
       const url=apiBase()+path;
       const r=await fetch(url,init);
-      if(!r.ok){
-        const t=await r.text().catch(()=>String(r.status));
-        throw new Error(`${r.status} ${t.slice(0,200)}`);
-      }
-      const ct=r.headers.get('content-type')||'';
-      return ct.includes('application/json')?r.json():r.text();
+      if(!r.ok){ const t=await r.text().catch(()=>String(r.status)); throw new Error(`${r.status} ${t.slice(0,200)}`); }
+      const ct=r.headers.get('content-type')||''; return ct.includes('application/json')?r.json():r.text();
     }
-
     async function doAction(path,body){
-      els.msg.textContent='Working…';
+      $('msg').textContent='Working…';
       try{
         const res=await apiFetch(path,{method:'POST',body:body?JSON.stringify(body):undefined});
-        els.msg.textContent=typeof res==='string'?res:'Done';
-        toast('Success');
-        await refresh();
-        if(path.startsWith('/keys')) loadKeys();
-        return res;
-      }catch(e){
-        els.msg.textContent=`Error: ${e.message}`;
-        toast('Failed');
-        throw e;
+        $('msg').textContent=typeof res==='string'?res:'Done'; toast('Success');
+        await refresh(); if(path.startsWith('/keys')) await loadKeys(); return res;
+      }catch(e){ $('msg').textContent=`Error: ${e.message}`; toast('Failed'); throw e; }
+    }
+
+    let allKeys=[]; let page=1; let selected=new Set();
+
+    function countsStr(arr){
+      const total=arr.length;
+      const active=arr.filter(k=>!(k.status||'').toLowerCase().includes('revok')).length;
+      const revoked=total-active;
+      return {total,active,revoked, text:`Total ${total} • Active ${active} • Revoked ${revoked}`};
+    }
+
+    function applyFiltersAndSort(){
+      const q=(pref.query||'').toLowerCase();
+      const filt=pref.filt;
+      let arr=allKeys.filter(k=>{
+        const text=`${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();
+        if(q && !text.includes(q)) return false;
+        const rev=(k.status||'').toLowerCase().includes('revok');
+        if(filt==='active'&&rev) return false;
+        if(filt==='revoked'&&!rev) return false;
+        return true;
+      });
+      const parts=pref.sort.split(',');
+      const keys=parts.filter(p=>p!=='asc'&&p!=='desc');
+      const dir=(parts.includes('desc')?'desc':'asc');
+      arr.sort((a,b)=>{
+        for(const k of keys){
+          let va=(a[k]||'').toString().toLowerCase();
+          let vb=(b[k]||'').toString().toLowerCase();
+          if(va<vb) return dir==='asc'?-1:1;
+          if(va>vb) return dir==='asc'?1:-1;
+        }
+        return 0;
+      });
+      return arr;
+    }
+
+    function render(){
+      const arr=applyFiltersAndSort();
+      $('counts').textContent=countsStr(arr).text;
+
+      const size=pref.size;
+      const totalPages=Math.max(1, Math.ceil(arr.length/size));
+      if(page>totalPages) page=totalPages;
+      const start=(page-1)*size;
+      const rows=arr.slice(start,start+size);
+
+      $('chips').innerHTML='';
+      if(pref.query){ const chip=document.createElement('div'); chip.className='chip'; chip.textContent=`Search: "${pref.query}" ✕`; chip.onclick=()=>{pref.query=''; $('search').value=''; render();}; $('chips').appendChild(chip);}
+      if(pref.filt!=='all'){ const chip=document.createElement('div'); chip.className='chip'; chip.textContent=`Status: ${pref.filt} ✕`; chip.onclick=()=>{pref.filt='all'; $('statusFilter').value='all'; render();}; $('chips').appendChild(chip);}
+      if(pref.sort!=='owner,key,asc'){ const chip=document.createElement('div'); chip.className='chip'; chip.textContent=`Sort: ${pref.sort} ✕`; chip.onclick=()=>{pref.sort='owner,key,asc'; $('sortSel').value='owner,key,asc'; render();}; $('chips').appendChild(chip);}
+
+      const header=`
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width:42px"><input type="checkbox" id="selAll"></th>
+              <th>Owner</th>
+              <th>Key</th>
+              <th>Status</th>
+              <th class="ta-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      const body=rows.map(k=>{
+        const rev=(k.status||'').toLowerCase().includes('revok');
+        const checked=selected.has(k.key)?'checked':'';
+        return `
+          <tr class="key-row ${rev?'rev':''}">
+            <td><input type="checkbox" class="selRow" data-k="${k.key}" ${checked}></td>
+            <td contenteditable="true" data-edit-owner="${k.key}" spellcheck="false">${k.owner||''}</td>
+            <td class="cell-mono" data-copy="${k.key}">${k.key}</td>
+            <td>${rev?'<span class="badge b-bad">REVOKED</span>':'<span class="badge b-ok">ACTIVE</span>'}</td>
+            <td class="ta-right">
+              ${rev?`<button class="btn-rim" data-unrevoke="${k.key}">Unrevoke</button>`
+                  :`<button class="btn-danger" data-revoke="${k.key}">Revoke</button>`}
+              <button class="btn-ghost" data-del="${k.key}">Delete</button>
+            </td>
+          </tr>`;
+      }).join('');
+      $('keys').innerHTML = '<div class="scroll-x">' + header + body + '</tbody></table></div>';
+
+      const selAll=$('keys').querySelector('#selAll');
+      if(selAll){
+        selAll.onclick=(e)=>{
+          const check=e.target.checked;
+          rows.forEach(k=>{ if(check) selected.add(k.key); else selected.delete(k.key); });
+          render();
+        };
+      }
+      $('selCount').textContent = `${selected.size} selected`;
+
+      $('keys').addEventListener('click', rowHandler, {once:true});
+
+      $('pageInfo').textContent=`Page ${page}/${totalPages}`;
+      $('prevPage').disabled = page<=1;
+      $('nextPage').disabled = page>=totalPages;
+    }
+
+    function rowHandler(e){
+      const t=e.target;
+      const copy=t.closest('[data-copy]');
+      const revoke=t.closest('[data-revoke]');
+      const unrevoke=t.closest('[data-unrevoke]');
+      const del=t.closest('[data-del]');
+      const sel=t.closest('.selRow');
+      const ed=t.closest('[data-edit-owner]');
+
+      if(copy){ navigator.clipboard.writeText(copy.dataset.copy).then(()=>toast('Key copied')); return; }
+      if(sel){ const key=sel.dataset.k; if(sel.checked) selected.add(key); else selected.delete(key); $('selCount').textContent = `${selected.size} selected`; return; }
+
+      if(ed && (e.type==='click' || e.type==='blur')){
+        ed.addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); ed.blur(); } }, {once:true});
+        ed.addEventListener('blur', async ()=>{
+          const key=ed.dataset.editOwner;
+          const owner=ed.textContent.trim();
+          try{ await doAction('/keys/owner',{key,owner}); logActivity(`Owner changed → ${owner} (${key.slice(0,6)}…)`);}catch{}
+        }, {once:true});
+        return;
+      }
+
+      if(revoke){
+        const key=revoke.dataset.revoke;
+        confirmDialog('Revoke this key?','Users will be blocked until unrevoked.').then(async ok=>{
+          if(!ok) return;
+          try{ await doAction('/keys/revoke',{key}); logActivity(`Revoked ${key.slice(0,6)}…`); toast('Revoked'); }catch{}
+        });
+        return;
+      }
+      if(unrevoke){
+        const key=unrevoke.dataset.unrevoke;
+        doAction('/keys/unrevoke',{key}).then(()=>{ logActivity(`Unrevoked ${key.slice(0,6)}…)`); toast('Unrevoked'); }).catch(()=>{});
+        return;
+      }
+      if(del){
+        const key=del.dataset.del;
+        confirmDialog('Delete this key?','Permanent removal.').then(async ok=>{
+          if(!ok) return;
+          try{ await doAction('/keys/delete',{key}); logActivity(`Deleted ${key.slice(0,6)}…`); toast('Deleted'); }catch{}
+        });
+        return;
       }
     }
+
+    function logActivity(s){
+      const time=new Date().toLocaleTimeString();
+      const div=document.createElement('div');
+      div.textContent=`[${time}] ${s}`;
+      $('activity').prepend(div);
+      while($('activity').children.length>30) $('activity').lastChild.remove();
+    }
+
+    function toCSV(keys){ return 'key,owner,status\n'+keys.map(k=>`${k.key},${k.owner||''},${k.status||''}`).join('\n')+'\n'; }
+    function download(name, text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'})); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
+    function parseCSV(text){ const lines=text.trim().split(/\r?\n/), out=[]; for(let i=1;i<lines.length;i++){ const [key,owner,status]=lines[i].split(','); if(key) out.push({key:key.trim(), owner:(owner||'').trim(), status:(status||'').trim()}); } return out; }
 
     async function refresh(){
       try{
         const j=await apiFetch('/status');
-        setBadge(els.c,!!j.cronix);
-        setDot(els.dotC,!!j.cronix);
-        els.lastRefresh.textContent='Updated '+new Date().toLocaleTimeString();
-        els.msg.textContent='Ready';
+        setBadge($('c'),!!j.cronix); setDot($('dot-c'),!!j.cronix);
+        $('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString();
+        $('msg').textContent='Ready';
       }catch(e){
-        setBadge(els.c,false);
-        setDot(els.dotC,false);
-        els.msg.textContent='Status error';
+        setBadge($('c'),false); setDot($('dot-c'),false); $('msg').textContent='Status error';
       }
     }
-
-    document.addEventListener('click',async e=>{
-      const b=e.target.closest('button[data-act]');
-      if(!b) return;
-      const path=b.dataset.act;
-      if(b.dataset.confirm){
-        const ok=await confirmDialog(b.dataset.confirm);
-        if(!ok) return;
-      }
-      doAction(path);
-    });
-
-    // Config form
-    const apiInput=document.getElementById('apiInput');
-    const secretInput=document.getElementById('secretInput');
-    const saveCfg=document.getElementById('saveCfg');
-    const resetCfg=document.getElementById('resetCfg');
-    apiInput.value=store.api;
-    secretInput.value=store.secret;
-    saveCfg.onclick=()=>{
-      store.api=apiInput.value.trim().replace(/\/+$/,'');
-      store.secret=secretInput.value.trim();
-      toast('Saved');
-    };
-    resetCfg.onclick=()=>{
-      store.reset();
-      apiInput.value=store.api;
-      secretInput.value=store.secret;
-      toast('Reset');
-    };
-
-    // Keys list
-    const ownerEl=document.getElementById('owner');
-    const countEl=document.getElementById('count');
-    const keyvalEl=document.getElementById('keyval');
-    const newownerEl=document.getElementById('newowner');
-    const searchEl=document.getElementById('search');
-    const statusFilterEl=document.getElementById('statusFilter');
+    function setBadge(el,up){ el.textContent=up?'ONLINE':'OFFLINE'; el.className='badge '+(up?'b-ok':'b-bad'); document.title = `CRONIX — ${up?'ONLINE':'OFFLINE'}`; }
+    function setDot(el,up){ el.className='dot '+(up?'ok':'bad'); }
 
     async function loadKeys(){
-      els.keysBox.textContent='Loading…';
+      $('keys').innerHTML = `<div class="scroll-x"><div style="height:140px;border:1px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Loading…</div></div>`;
       try{
         const j=await apiFetch('/keys');
         allKeys=j.keys||[];
-        renderKeys();
-      }catch{
-        els.keysBox.textContent='Failed to load keys';
-      }
+        render();
+      }catch{ $('keys').textContent='Failed to load keys'; }
     }
 
-    let allKeys=[];
-    function renderKeys(){
-      const q=(searchEl.value||'').toLowerCase();
-      const filt=statusFilterEl.value;
-      const rows=allKeys
-        .filter(k=>{
-          const text=`${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();
-          if(q && !text.includes(q)) return false;
-          const rev=(k.status||'').toLowerCase().includes('revok');
-          if(filt==='active'&&rev) return false;
-          if(filt==='revoked'&&!rev) return false;
-          return true;
-        })
-        .map(k=>`
-          <tr class="key-row ${(k.status||'').toLowerCase().includes('revok')?'rev':''}">
-            <td style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all" data-copy="${k.key}">${k.key}</td>
-            <td>${k.owner||''}</td>
-            <td>${(k.status||'').toLowerCase().includes('revok')
-              ?'<span class="badge b-bad">REVOKED</span>'
-              :'<span class="badge b-ok">ACTIVE</span>'}
-            </td>
-            <td class="right">
-              ${(k.status||'').toLowerCase().includes('revok')
-                ?`<button class="btn-rim-small" data-row-unrevoke="${k.key}">Unrevoke</button>`
-                :`<button class="btn-danger" data-row-revoke="${k.key}">Revoke</button>`}
-              <button class="btn-ghost" data-row-del="${k.key}">Delete</button>
-            </td>
-          </tr>`).join('');
-
-      els.keysBox.innerHTML=`
-        <table class="table">
-          <thead>
-            <tr><th>Key</th><th>Owner</th><th>Status</th><th class="right">Actions</th></tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>`;
+    async function bulk(type){
+      if(selected.size===0){ toast('Select some keys'); return; }
+      const keys=[...selected];
+      if(type==='revoke'){
+        const ok=await confirmDialog(`Revoke ${keys.length} keys?`,'Users will be blocked.'); if(!ok) return;
+        await Promise.all(keys.map(key=>doAction('/keys/revoke',{key}).catch(()=>{}))); toast('Revoked selected'); logActivity(`Bulk revoke: ${keys.length}`);
+      }else if(type==='unrevoke'){
+        await Promise.all(keys.map(key=>doAction('/keys/unrevoke',{key}).catch(()=>{}))); toast('Unrevoked selected'); logActivity(`Bulk unrevoke: ${keys.length}`);
+      }else if(type==='delete'){
+        const ok=await confirmDialog(`Delete ${keys.length} keys?`,'Permanent removal.'); if(!ok) return;
+        await Promise.all(keys.map(key=>doAction('/keys/delete',{key}).catch(()=>{}))); toast('Deleted selected'); logActivity(`Bulk delete: ${keys.length}`);
+      }
+      selected.clear(); render();
     }
 
-    els.keysBox.addEventListener('click',async e=>{
-      const t=e.target;
-      const revoke=t.closest('[data-row-revoke]');
-      const unrevoke=t.closest('[data-row-unrevoke]');
-      const del=t.closest('[data-row-del]');
-      const copy=t.closest('[data-copy]');
+    function savePrefsUI(){
+      $('sortSel').value=pref.sort;
+      $('pageSize').value=String(pref.size);
+      $('statusFilter').value=pref.filt;
+      $('search').value=pref.query;
+      $('autoRefresh').checked=pref.auto;
+    }
 
-      if(revoke){
-        const ok=await confirmDialog('Revoke this key?','Users will be blocked until unrevoked.');
-        if(ok) await doAction('/keys/revoke',{key:revoke.dataset.rowRevoke});
-        return;
-      }
-      if(unrevoke){
-        const ok=await confirmDialog('Unrevoke this key?','Access will be restored.');
-        if(ok) await doAction('/keys/unrevoke',{key:unrevoke.dataset.rowUnrevoke});
-        return;
-      }
-      if(del){
-        const ok=await confirmDialog('Delete this key?','Permanent removal.');
-        if(ok) await doAction('/keys/delete',{key:del.dataset.rowDel});
-        return;
-      }
-      if(copy){
-        try{ await navigator.clipboard.writeText(copy.dataset.copy); toast('Key copied'); }
-        catch{ toast('Copy failed'); }
-      }
+    document.addEventListener('click',async e=>{
+      const b=e.target.closest('button[data-act]'); if(!b) return;
+      const path=b.dataset.act;
+      if(b.dataset.confirm){ const ok=await confirmDialog(b.dataset.confirm); if(!ok) return; }
+      doAction(path);
     });
+    $('refreshBtn').onclick=()=>{refresh(); loadKeys();};
+    $('refreshBtn2').onclick=()=>{refresh(); loadKeys();};
 
-    document.getElementById('btnGen').onclick=async()=>{
-      const owner=(ownerEl.value||'manual').trim();
-      const n=Math.max(1,Math.min(100,parseInt(countEl.value||'1')));
+    let st=null;
+    $('search').addEventListener('input',()=>{ clearTimeout(st); st=setTimeout(()=>{ pref.query=$('search').value.trim(); page=1; render(); }, 120); });
+    window.addEventListener('keydown',e=>{ if(e.key==='/' && document.activeElement!==$('search')){ e.preventDefault(); $('search').focus(); } });
+
+    $('statusFilter').onchange=()=>{ pref.filt=$('statusFilter').value; page=1; render(); };
+    $('sortSel').onchange=()=>{ pref.sort=$('sortSel').value; page=1; render(); };
+    $('pageSize').onchange=()=>{ pref.size=parseInt($('pageSize').value); page=1; render(); };
+
+    $('prevPage').onclick=()=>{ if(page>1){ page--; render(); } };
+    $('nextPage').onclick=()=>{ page++; render(); };
+
+    $('btnGen').onclick=async()=>{
+      const owner=($('owner').value||'manual').trim();
+      const n=Math.max(1,Math.min(100,parseInt($('count').value||'1')));
       const res=await doAction('/keys/generate',{n,owner});
       const keys=(res&&Array.isArray(res.created))?res.created:[];
-      if(keys.length){ keysPopup(owner,keys); } else { toast('No keys returned'); }
+      if(keys.length){ await loadKeys(); logActivity(`Generated ${keys.length} → ${owner}`); try{ await navigator.clipboard.writeText(keys.join('\n')); toast('Keys copied'); }catch{} }
+      else toast('No keys returned');
+    };
+    $('btnAdd').onclick=async()=>{
+      const key=($('keyval').value||'').trim().toLowerCase(); if(!key){ toast('Enter a key'); return; }
+      const owner=($('newowner').value||'manual').trim();
+      await doAction('/keys/add',{key,owner}); await loadKeys(); logActivity(`Added ${key.slice(0,6)}… → ${owner}`);
     };
 
-    document.getElementById('btnAdd').onclick=async()=>{
-      const key=(keyvalEl.value||'').trim().toLowerCase();
-      if(!key){ toast('Enter a key'); return; }
-      const owner=(newownerEl.value||'manual').trim();
-      await doAction('/keys/add',{key,owner});
-      keyAddedPopup(owner,key);
+    $('bulkRevoke').onclick=()=>bulk('revoke');
+    $('bulkUnrevoke').onclick=()=>bulk('unrevoke');
+    $('bulkDelete').onclick=()=>bulk('delete');
+
+    $('copyAll').onclick=async()=>{
+      const arr=applyFiltersAndSort(); const text=arr.map(k=>k.key).join('\n');
+      try{ await navigator.clipboard.writeText(text); toast('All keys copied'); }catch{ toast('Copy failed'); }
     };
 
-    document.getElementById('btnRefresh').onclick=()=>loadKeys();
-    searchEl?.addEventListener('input',renderKeys);
-    statusFilterEl?.addEventListener('change',renderKeys);
+    $('exportCsv').onclick=()=>{ const csv=toCSV(applyFiltersAndSort()); download('cronix-keys.csv', csv); };
+    $('importCsvBtn').onclick=()=>$('importCsv').click();
+    $('importCsv').onchange=async(e)=>{
+      const file=e.target.files[0]; if(!file) return;
+      const text=await file.text(); const rows=parseCSV(text);
+      if(!rows.length){ toast('Empty CSV'); return; }
+      const ok=await confirmDialog(`Import ${rows.length} keys?`,'Existing duplicates may fail.');
+      if(!ok) return;
+      for(const r of rows){ try{ await doAction('/keys/add',{key:r.key.trim(), owner:r.owner||'import'});}catch{} }
+      await loadKeys(); logActivity(`Imported ${rows.length} from CSV`);
+    };
 
-    // Embers
-    const emberCount=30;
-    for(let i=0;i<emberCount;i++){
-      const ember=document.createElement("div");
-      ember.className="ember";
-      ember.style.left=Math.random()*100+"vw";
-      ember.style.animationDuration=6+Math.random()*6+"s";
-      ember.style.animationDelay=Math.random()*8+"s";
-      document.body.appendChild(ember);
-    }
+    let timer=null;
+    function setAuto(b){ if(timer){ clearInterval(timer); timer=null; } if(b){ timer=setInterval(()=>{ refresh(); loadKeys(); }, 5000); } }
+    $('autoRefresh').onchange=()=>{ pref.auto=$('autoRefresh').checked; setAuto(pref.auto); };
 
-    // Init
-    refresh(); loadKeys(); setInterval(refresh,4000);
+    savePrefsUI(); refresh(); loadKeys(); setAuto(pref.auto);
   </script>
 </body>
 </html>
