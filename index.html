@@ -1,641 +1,359 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>CRONIX Admin Panel</title>
-  <style>
+<meta charset="UTF-8">
+<title>CRONIX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap');
 
-    /* ===== Muted dark theme + fix native dropdown/controls ===== */
-    :root{
-      color-scheme: dark;
-      --bg0:#050505; --bg1:#0a0606;
-      --panel:#120606;
-      --border:#1c0b0b; --border-strong:#2a0e0e;
-      --text:#e7e7e7; --muted:#a8a8a8;
-      --accent:#e02b2b;
-      --accent-deep:#5e0f0f;
-      --ok:#16331d; --ok-text:#58d46a;
-      --bad:#361919; --bad-text:#ff8a8a;
-      --btn:#140909; --btn-hover:#1a0c0c;
-      --shadow:0 10px 24px rgba(0,0,0,.25);
-      --safe:env(safe-area-inset-bottom,0px);
-      --radius:16px;
-      --focus:#6a2323;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(180deg, #000 0%, #0b0000 100%);
+    color: #eee;
+    overflow-x: hidden;
+    line-height: 1.6;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:'Orbitron',system-ui,Segoe UI,Arial;
-      color:var(--text);
-      background:linear-gradient(180deg,var(--bg0) 0%, var(--bg1) 100%);
-      line-height:1.5; overflow-x:hidden;
-      -webkit-tap-highlight-color: transparent;
-      color-scheme: dark;
+    .glow-red { text-shadow: 0 0 8px #ff2424, 0 0 20px #ff2424; }
+    .btn {
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 40px;
+    background: #ff2424;
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 0 12px #ff2424, inset 0 0 8px #8b0000;
+    transition: 0.3s;
+    cursor: pointer;
     }
-    .soft-glow{ text-shadow:0 0 4px rgba(224,43,43,.25); }
+    .btn:hover { background: #8b0000; box-shadow: 0 0 18px #ff4444; }
+    .btn:active { transform: scale(0.96); }
 
-    /* ===== HERO ===== */
-    header.hero{
-      padding:48px 5% 28px;
-      background:
-        radial-gradient(1200px 450px at 50% -10%, rgba(224,43,43,.08), transparent 65%),
-        radial-gradient(700px 300px at 50% 120%, rgba(224,43,43,.06), transparent 70%),
-        linear-gradient(180deg,#090707 0%, #060404 100%);
-      display:flex; flex-direction:column; align-items:center; text-align:center;
-      position:relative; overflow:hidden; border-radius:0 0 var(--radius) var(--radius);
+    header {
+    min-height: auto;
+    padding: 60px 5% 40px;
+    background: radial-gradient(circle at center, #150000 0%, #000 80%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 40px 40px;
     }
-    .logo{
-      width:140px;height:140px;
-      background:url('https://i.postimg.cc/MHff0dQQ/cronix.webp') no-repeat center/cover;
-      border-radius:50%;
-      filter:drop-shadow(0 0 10px rgba(224,43,43,.25));
-      margin-bottom:12px;
+    header::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,36,36,0.15) 0%, transparent 60%);
+    animation: pulse 6s infinite;
+    pointer-events: none;
+    z-index: 1;
     }
-    header.hero h1{font-size:2rem;margin:6px 0 4px}
-    header.hero p{color:var(--muted);margin:0;font-size:.95rem}
+    @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 0.2; }
+    }
+    .logo {
+    width: 180px;
+    height: 180px;
+    background: url('https://i.postimg.cc/MHff0dQQ/cronix.webp') no-repeat center/cover;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 25px #ff2424);
+    margin-bottom: 20px;
+    animation: eyePulse 4s infinite;
+    position: relative;
+    z-index: 2;
+    }
+    @keyframes eyePulse {
+    0%,100% { filter: drop-shadow(0 0 25px #ff2424); }
+    50% { filter: drop-shadow(0 0 50px #ff4444); }
+    }
+    header h1 { font-size: 2.8rem; margin-bottom: 12px; position: relative; z-index: 2; }
+    header p  { margin: 10px 0 20px; font-size: 1.1rem; color: #bbb; position: relative; z-index: 2; }
 
-    /* ===== SHELL ===== */
-    .sheet{max-width:1000px;margin:22px auto;padding:0 14px}
-    .card{
-      background:linear-gradient(180deg, rgba(18,6,6,.9), rgba(12,5,5,.9));
-      border:1px solid var(--border);               /* FIX: visible outer border */
-      border-radius:calc(var(--radius) + 2px);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;                             /* FIX: keep ::before inside */
+    .pricing {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
     }
-    .card::before{                                   /* subtle inner+outer rim */
-      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-      box-shadow:
-        0 0 0 1px rgba(224,43,43,.15),
-        inset 0 0 0 1px rgba(224,43,43,.06);
+    .price-card {
+    background: rgba(20,0,0,0.85);
+    border: 1px solid #220000;
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    max-width: 380px;
+    box-shadow: 0 0 20px rgba(255,36,36,0.3);
+    }
+    .price-card h3 { font-size: 1.5rem; color: #ff2424; margin-bottom: 8px; }
+    .price-card .amount { font-size: 2.2rem; margin: 10px 0; }
+    .price-card p { color: #bbb; margin-bottom: 16px; }
+
+    section {
+    padding: 60px 8%;
+    position: relative;
+    border-radius: 40px;
+    }
+    section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #ff2424;
     }
 
-    .hdr{
-      position:sticky; top:0; z-index:5;
-      background:linear-gradient(180deg,rgba(10,6,6,.92),rgba(10,6,6,.86));
-      border-bottom:1px solid var(--border);
-      padding:14px 16px;
-      display:grid; gap:8px;
-      backdrop-filter:saturate(1.1) blur(2px);
+    .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+    gap: 20px;
     }
-    .title{display:flex;align-items:center;gap:10px;font-weight:800}
-    .sub{color:var(--muted);font-size:12px}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .pill{
-      border:1px solid var(--border);
-      padding:8px 12px;border-radius:999px;
-      display:inline-flex;align-items:center;gap:8px;
-      background:rgba(255,255,255,.02);
+    .feature {
+    background: rgba(20,0,0,0.75);
+    border: 1px solid #220000;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    transition: 0.3s;
     }
-    .dot{width:8px;height:8px;border-radius:50%}.ok{background:#22c55e}.bad{background:#ef4444}
-    .badge{padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;border:1px solid var(--border)}
-    .b-ok{background:var(--ok);color:var(--ok-text)} .b-bad{background:var(--bad);color:var(--bad-text)}
-    .muted{color:var(--muted)}
-    .right{margin-left:auto}
-    .ta-right{text-align:right}                      /* FIX: for table header/cells */
+    .feature:hover { border-color: #ff2424; box-shadow: 0 0 18px rgba(255,36,36,0.4); }
 
-    .body{padding:16px}
-    .section{padding:14px 0;border-bottom:1px dashed var(--border)} .section:last-child{border-bottom:none}
-    .stack{display:flex;flex-direction:column;gap:10px}
+    .stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    text-align: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    }
+    .stat { font-size: 1.6rem; color: #ff2424; }
+    .stat-label { font-size: 0.85rem; color: #aaa; }
 
-    /* ===== Controls ===== */
-    input,button,select{
-      background:var(--btn); border:1px solid var(--border-strong); color:var(--text);
-      padding:12px 14px; border-radius:12px; min-height:44px; font-weight:800;
-      box-shadow:inset 0 -1px 0 rgba(255,255,255,.03);
-      outline:none;
+    .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 20px;
+    justify-content: center;
     }
-    input:focus, select:focus, button:focus{
-      border-color:var(--focus);
-      box-shadow:0 0 0 2px rgba(224,43,43,.15) inset; /* FIX: consistent focus ring */
+    .gallery iframe, .gallery video, .gallery img {
+    border-radius: 20px;
+    border: 2px solid #220000;
+    width: 100%;
+    height: 220px;
+    box-shadow: 0 0 12px rgba(255,36,36,0.2);
     }
 
-    /* FIX: dark native dropdowns (no white popup in menus) */
-    select{
-      appearance:none; -webkit-appearance:none; -moz-appearance:none;
-      background:var(--btn) !important;
-      color:var(--text) !important;
-      background-image:none;
-      border-color:var(--border-strong);
+    .vouches {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-content: center;
     }
-    option{ background:#0f0a0a !important; color:var(--text) !important; }
-    select::-ms-expand{ display:none; }              /* old IE arrow */
-    /* Number spinners */
-    input[type=number]{-moz-appearance:textfield}
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0 }
+    .vouches img {
+    border-radius: 14px;
+    border: 1px solid #220000;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(255,36,36,0.3);
+    transition: transform 0.3s;
+    cursor: pointer;
+    }
+    .vouches img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 18px rgba(255,36,36,0.5);
+    }
 
-    .btn{
-      display:inline-block; cursor:pointer; text-decoration:none; text-align:center;
-      border-radius:12px; background:linear-gradient(180deg, #251010, #1a0c0c);
-      color:#fff; border:1px solid #3a1212; transition:.2s;
+    .steps, .testimonials, .comparison, .faq {
+    max-width: 1000px;
+    margin: auto;
     }
-    .btn:hover{filter:brightness(1.04)}
-    .btn:active{transform:translateY(1px)}
-    .btn-ghost{background:transparent;border-color:var(--border-strong)}
-    .btn-danger{background:linear-gradient(180deg, #3a1515, #2a1010); border-color:#6a2323}
-    .btn-danger:hover{filter:brightness(1.03)}
-    .btn-rim{ background:linear-gradient(180deg,#211010,#180c0c); border:1px solid rgba(224,43,43,.35); }
+    .step, .testimonial, .faq-item {
+    background: rgba(20,0,0,0.75);
+    border: 1px solid #220000;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: 0.3s;
+    }
+    .step:hover, .testimonial:hover, .faq-item:hover {
+    border-color: #ff2424;
+    box-shadow: 0 0 15px rgba(255,36,36,0.3);
+    }
+    .testimonial p { font-style: italic; color: #ccc; }
+    .comparison table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 0.95rem;
+    }
+    .comparison th, .comparison td {
+    border: 1px solid #220000;
+    padding: 12px;
+    }
+    .comparison th {
+    background: rgba(255,36,36,0.15);
+    color: #ff2424;
+    }
+    .faq-item h3 { cursor: pointer; margin: 0; }
+    .faq-item p { display: none; margin-top: 10px; color: #bbb; }
 
-    .dock{
-      position:sticky; bottom:0; z-index:6; padding:10px 14px calc(10px + var(--safe));
-      background:linear-gradient(180deg,rgba(10,6,6,0),rgba(10,6,6,.9) 28%);
-      display:none; gap:8px; backdrop-filter:blur(2px);
-      border-top:1px solid var(--border);           /* FIX: clear top edge */
+    footer {
+    background: #050000;
+    padding: 18px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+    border-top: 1px solid #220000;
+    border-radius: 40px 40px 0 0;
     }
-    .dock .btn, .dock .btn-rim, .dock .btn-danger{flex:1; min-height:48px}
 
-    /* ===== Table ===== */
-    .scroll-x{overflow:auto}
-    .table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px}
-    .table th,.table td{
-      padding:10px;
-      border-bottom:1px solid var(--border);         /* FIX: consistent row separators */
-      vertical-align:middle;
+    .ember {
+    position: fixed;
+    width: 4px; height: 4px;
+    background: #ff2424;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff2424;
+    opacity: 0.7;
+    pointer-events: none;
+    animation: float 8s linear infinite;
     }
-    .table th{ text-align:left;color:var(--muted);font-weight:800 }
-    .key-row.rev{background:linear-gradient(0deg, rgba(224,43,43,.06), rgba(224,43,43,.06))}
-    .cell-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}
+    @keyframes float {
+    from { transform: translateY(100vh) scale(0.5); opacity: 0.8; }
+    to { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
 
-    .chips{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:#0f0a0a;font-weight:800}
-    .pager{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
-    .pager button{min-width:44px}
-
-    /* ===== Mobile ===== */
-    @media (max-width:860px){
-      .row.stack-m{flex-direction:column}
-      .row.stack-m > *{width:100%}
-    }
-    @media (max-width:760px){
-      header.hero h1{font-size:1.7rem}
-      .toolbar{display:none}
-      .dock{display:flex}
-      .table th:nth-child(2), .table td:nth-child(2){display:none}
-    }
-  </style>
+    @media (max-width: 900px) { .vouches { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .vouches { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
-  <header class="hero">
+<header>
     <div class="logo"></div>
-    <h1 class="soft-glow">CRONIX Admin Panel</h1>
-    <p>Manage keys & control Cronix's backend.</p>
-  </header>
-
-  <div class="sheet">
-    <div class="card" role="region" aria-label="Cronix One-Page Panel">
-      <div class="hdr">
-        <div class="title">Control Center <span class="sub" id="lastRefresh">—</span></div>
-
-        <div class="row">
-          <span class="pill">
-            Cronix <span id="dot-c" class="dot"></span> <span id="c" class="badge b-bad">OFFLINE</span>
-          </span>
-          <span class="pill"><span id="counts" class="muted">Total 0 • Active 0 • Revoked 0</span></span>
-          <span class="pill right"><span id="msg" class="muted">Ready</span></span>
-        </div>
-
-        <div class="row stack-m">
-          <input id="search" placeholder="Search (/ to focus)…" style="flex:1" />
-          <div class="row" style="gap:10px">
-            <select id="statusFilter" title="Filter">
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="revoked">Revoked</option>
-            </select>
-            <select id="sortSel" title="Sort">
-              <option value="owner,key,asc">Owner A→Z (default)</option>
-              <option value="key,asc">Key A→Z</option>
-              <option value="status,asc">Status A→Z</option>
-            </select>
-            <select id="pageSize" title="Page size">
-              <option>10</option><option selected>25</option><option>50</option><option>100</option>
-            </select>
-            <label class="pill" style="gap:6px">
-              <input id="autoRefresh" type="checkbox" style="width:18px;height:18px"> Auto-refresh
-            </label>
-          </div>
-        </div>
-
-        <div class="row stack-m">
-          <div class="chips" id="chips"></div>
-          <span class="right" style="display:flex;gap:10px">
-            <button id="exportCsv" class="btn-rim">Export CSV</button>
-            <input id="importCsv" type="file" accept=".csv" style="display:none">
-            <button id="importCsvBtn" class="btn-ghost">Import CSV</button>
-          </span>
-        </div>
-
-        <div class="row">
-          <div class="toolbar" style="gap:10px">
-            <button data-act="/start" class="btn-rim">Start</button>
-            <button data-act="/stop" class="btn-danger" data-confirm="Stop Cronix?">Stop</button>
-            <button id="copyAll" class="btn">Copy all keys</button>
-            <button id="refreshBtn" class="btn-ghost">Refresh</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="body">
-        <section class="section" aria-label="Keys Manager">
-          <h3 style="margin:0 0 8px;color:#d14a4a">Keys</h3>
-
-          <div class="row" style="gap:8px;margin-bottom:8px">
-            <button id="bulkRevoke" class="btn-danger">Revoke selected</button>
-            <button id="bulkUnrevoke" class="btn-rim">Unrevoke selected</button>
-            <button id="bulkDelete" class="btn-ghost">Delete selected</button>
-            <span class="muted" id="selCount">0 selected</span>
-          </div>
-
-          <div class="row stack-m">
-            <input id="owner" placeholder="Owner name (e.g. Timmy123)" />
-            <input id="count" type="number" value="1" min="1" max="100" style="width:120px" />
-            <button id="btnGen" class="btn-rim">Generate Keys</button>
-          </div>
-          <div class="row stack-m" style="margin-top:8px">
-            <input id="keyval" placeholder="Paste a key (lowercase)" style="flex:1" />
-            <input id="newowner" placeholder="Owner for this key" style="width:220px" />
-            <button id="btnAdd" class="btn-rim">Add Key</button>
-          </div>
-
-          <div id="keys" class="scroll-x" style="margin-top:10px">
-            <div style="height:140px;border:1px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Loading…</div>
-          </div>
-
-          <div class="pager">
-            <button id="prevPage" class="btn-ghost">◀</button>
-            <span id="pageInfo" class="muted">Page 1/1</span>
-            <button id="nextPage" class="btn-ghost">▶</button>
-          </div>
-        </section>
-
-        <section class="section">
-          <h3 style="margin:0 0 8px;color:#d14a4a">Activity</h3>
-          <div id="activity" class="stack muted"></div>
-        </section>
-      </div>
-
-      <div class="dock">
-        <button data-act="/start" class="btn-rim">Start</button>
-        <button id="refreshBtn2" class="btn-ghost">Refresh</button>
-        <button data-act="/stop" class="btn-danger">Stop</button>
-      </div>
+    <h1 class="glow-red">CRONIX</h1>
+<p>
+Cronix is the only tool achieving <strong>sub&nbsp;20ms join speeds</strong>, a performance typically reserved for local endpoints. 
+It connects to <strong>1–10M+ value servers</strong> in as little as <strong>20ms</strong>, delivering unmatched speeds, making it one of the best tools in the market.
+</p>
+    <div class="pricing">
+    <div class="price-card">
+        <h3>Lifetime Access</h3>
+        <div class="amount">$14.99</div>
+        <p>One-time payment. No subscriptions. Instant access to all features.</p>
+        <a href="https://discord.gg/GErkSCbuFM" class="btn discord-link" rel="noopener">Buy on Discord</a>
     </div>
-  </div>
-
-  <!-- Minimal toast -->
-  <div id="toast" role="status" aria-live="polite" style="
-    position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
-    background:#0f0a0a;border:1px solid var(--border);
-    padding:10px 14px;border-radius:10px;box-shadow:var(--shadow);
-    opacity:0;pointer-events:none;transition:opacity .18s,bottom .18s;z-index:50;color:var(--text)
-  "></div>
-
-  <!-- Modal host -->
-  <div id="modalRoot" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);align-items:center;justify-content:center;z-index:60;"></div>
-
-  <script>
-    /* ================== Logic ================== */
-
-    const DEFAULTS={API:"https://9ed41e73e5f8.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
-    const store={ g:k=>localStorage.getItem(k), s:(k,v)=>localStorage.setItem(k,v) };
-    const pref={
-      get api(){return store.g('cronix_api')||DEFAULTS.API}, set api(v){store.s('cronix_api',v)},
-      get secret(){return store.g('cronix_secret')||DEFAULTS.SECRET}, set secret(v){store.s('cronix_secret',v)},
-      get sort(){return store.g('cronix_sort')||'owner,key,asc'}, set sort(v){store.s('cronix_sort',v)},
-      get size(){return parseInt(store.g('cronix_psize')||'25')}, set size(n){store.s('cronix_psize',String(n))},
-      get auto(){return (store.g('cronix_auto')||'0')==='1'}, set auto(b){store.s('cronix_auto',b?'1':'0')},
-      get filt(){return store.g('cronix_filt')||'all'}, set filt(v){store.s('cronix_filt',v)},
-      get query(){return store.g('cronix_q')||''}, set query(v){store.s('cronix_q',v)}
-    };
-
-    const $=id=>document.getElementById(id);
-    const els={
-      msg:$('msg'), c:$('c'), dotC:$('dot-c'), lastRefresh:$('lastRefresh'),
-      toast:$('toast'), keysBox:$('keys'), counts:$('counts'), chips:$('chips'),
-      pageInfo:$('pageInfo'), selCount:$('selCount'), activity:$('activity'),
-      search:$('search'), statusFilter:$('statusFilter'), sortSel:$('sortSel'),
-      pageSize:$('pageSize'), autoRefresh:$('autoRefresh'),
-      prevPage:$('prevPage'), nextPage:$('nextPage'),
-      refreshBtn:$('refreshBtn'), refreshBtn2:$('refreshBtn2'),
-      exportCsv:$('exportCsv'), importCsv:$('importCsv'), importCsvBtn:$('importCsvBtn'),
-      btnGen:$('btnGen'), btnAdd:$('btnAdd'),
-      owner:$('owner'), count:$('count'), keyval:$('keyval'), newowner:$('newowner'),
-      bulkRevoke:$('bulkRevoke'), bulkUnrevoke:$('bulkUnrevoke'), bulkDelete:$('bulkDelete'),
-      copyAll:$('copyAll'),
-    };
-
-    function toast(text){
-      const el=els.toast; el.textContent=text; el.style.opacity='1'; el.style.bottom='22px';
-      clearTimeout(el._t); el._t=setTimeout(()=>{el.style.opacity='0'; el.style.bottom='18px';},1800);
+    </div>
+</header>
+<section id="features">
+    <h2>Why Cronix?</h2>
+    <div class="features">
+<div class="feature"><h3>⚡ Instant Joins</h3><p><strong>20ms</strong> Websocket join speeds powered by multi endpoint coverage across NA East and EU cloud hosts.</p></div>
+<div class="feature"><h3>⚡ Smart Filtering</h3><p>Auto-skips full lobbies, low value servers, and suspected script user servers focusing only on <b>high value servers</b>.</p></div>
+<div class="feature"><h3>⚡ 10M+ Supported</h3><p>Direct access to <b>10M+ value servers</b>, including top brainrots like <b>La Grande’s</b>.</p></div>
+<div class="feature"><h3>⚡ Lifetime Deal</h3><p>One-time <b>$14.99</b> no subs, no fees. Cronix is yours forever on PC & mobile.</p></div>
+    </div>
+</section>
+<section class="stats">
+    <div><div class="stat">Support</div><div class="stat-label">Full PC & Mobile Support</div></div>
+    <div><div class="stat">20+</div><div class="stat-label">Active Buyers</div></div>
+<div><div class="stat">20ms</div><div class="stat-label">Avg. Join Speed</div></div>
+<div><div class="stat">$14.99</div><div class="stat-label">Lifetime Access</div></div>
+</section>
+<section>
+<h2>Obtaining Cronix</h2>
+<div class="steps">
+    <div class="step">1. Join our Discord & open a purchase ticket</div>
+    <div class="step">2. Purchase once for $14.99</div>
+    <div class="step">3. Activate your key (one-time setup)</div>
+<div class="step">5. Stack up on high value brainrots</div>
+</div>
+</section>
+<section id="showcase">
+    <h2>Showcase</h2>
+    <div class="gallery">
+    <iframe src="https://www.youtube.com/embed/whXS7I3v-0w" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/j9njQXbjkXs" allowfullscreen></iframe>
+    </div>
+</section>
+<section>
+    <h2>Vouches</h2>
+    <div class="vouches">
+    <img src="https://i.postimg.cc/L8jKWH8n/image-2025-09-04-031723059.png" alt="Vouch 1">
+    <img src="https://i.postimg.cc/MTPhBHdr/image-2025-09-04-031757522.png" alt="Vouch 2">
+    <img src="https://i.postimg.cc/wj8nLSQH/image-2025-09-04-031834674.png" alt="Vouch 3">
+    <img src="https://i.postimg.cc/qgfDc3nQ/image-2025-09-04-031920275.png" alt="Vouch 4">
+    <img src="https://i.postimg.cc/s2BnLmcK/image-2025-09-04-032014092.png" alt="Vouch 5">
+    <img src="https://i.postimg.cc/GtRqHC1S/image-2025-09-04-032100215.png" alt="Vouch 6">
+    </div>
+</section>
+<section>
+    <h2>Feedback</h2>
+    <div class="testimonials">
+    <div class="testimonial"><p>"Probably is the best auto joiner in terms of speed, price, and service. I’m sure you won’t find anything like this auto joiner. Most if not all other auto joiners are unreasonably pricey, have stingy devs that catch an ego because the made a semi working script"</p></div>
+    <div class="testimonial"><p>"Only cronix, The best thing I've seen on my phone is the auto joyner, I recommend it 10/10 😍"</p></div>
+    <div class="testimonial"><p>"Auto is really good works fast, this is just 1 account full from using it, can vouch its good👍  "</p></div>
+    </div>
+</section>
+<section>
+<section>
+<h2>Cronix vs Typical Auto Joiners</h2>
+<div class="comparison">
+    <table>
+    <tr><th></th><th>Cronix</th><th>Typical Auto Joiner</th></tr>
+    <tr><td>Join Speed</td><td>~20ms</td><td>200ms–1s+</td></tr>
+    <tr><td>Technology</td><td>WebSockets across 3 cloud servers (NA, EU, Asia)</td><td>Basic HTTP polling, single host</td></tr>
+    <tr><td>Server Coverage</td><td>Multi-region redundancy, lower ping</td><td>One region, higher latency</td></tr>
+    <tr><td>Advanced Bypasses</td><td>Available</td><td>No bypass</td></tr>
+    <tr><td>Discord Token</td><td>Not required (safe, zero ban risk)</td><td>Often required (can cause Discord/IP bans)</td></tr>
+    <tr><td>Payment</td><td>$14.99 lifetime</td><td>Monthly/weekly subscriptions</td></tr>
+    <tr><td>Device Support</td><td>PC & Mobile</td><td>PC only (most cases)</td></tr>
+    </table>
+</div>
+</section>
+<section>
+    <h2>FAQ</h2>
+    <div class="faq">
+    <div class="faq-item"><h3 onclick="toggleFaq(this)">Is this really a one time payment?</h3><p>Yes. Pay $14.99 once, get lifetime access. No daily or weekly subscriptions.</p></div>
+    <div class="faq-item"><h3 onclick="toggleFaq(this)">How fast is Cronix?</h3><p>Cronix on good wifi and device can hit sub-20ms joins.</p></div>
+    <div class="faq-item"><h3 onclick="toggleFaq(this)">How do I buy?</h3><p>Click “Buy on Discord” → Get your key instantly.</p></div>
+    </div>
+</section>
+<footer>
+    © 2025 CRONIX Auto Joiner. Made by <b>Zenyical</b>. All Rights Reserved.
+</footer>
+<script>
+    function toggleFaq(el) {
+    let p = el.nextElementSibling;
+    p.style.display = (p.style.display === "block") ? "none" : "block";
     }
-
-    function confirmDialog(msg, sub=''){
-      return new Promise((res)=>{
-        const root=$('modalRoot');
-        root.innerHTML=`
-          <div role="document" style="max-width:520px;width:calc(100% - 32px);margin:auto;background:#140b0b;border:1px solid #1c0b0b;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.3);overflow:hidden">
-            <header style="padding:12px 14px;border-bottom:1px solid #1c0b0b;font-weight:800">Please confirm</header>
-            <div style="padding:12px 14px;color:#d8d8d8">
-              <div style="display:flex;flex-direction:column;gap:8px">
-                <div>${msg}</div>${sub?`<div style="color:#9a9a9a">${sub}</div>`:''}
-              </div>
-            </div>
-            <footer style="padding:12px 14px;border-top:1px solid #1c0b0b;display:flex;gap:8px;justify-content:flex-end">
-              <button id="mCancel" class="btn-ghost">Cancel</button>
-              <button id="mOk" class="btn-rim">Confirm</button>
-            </footer>
-          </div>`;
-        root.style.display='flex'; root.setAttribute('aria-hidden','false');
-        const end=v=>{root.style.display='none'; root.innerHTML=''; res(v);};
-        root.addEventListener('click',e=>{ if(e.target===root) end(false); });
-        root.querySelector('#mCancel').onclick=()=>end(false);
-        root.querySelector('#mOk').onclick=()=>end(true);
-        window.addEventListener('keydown',function esc(ev){ if(ev.key==='Escape'){ window.removeEventListener('keydown',esc); end(false);} });
-      });
+    (function setupDiscordLinks() {
+    const INVITE = "https://discord.gg/GErkSCbuFM";
+    const APP = "discord://discord.gg/GErkSCbuFM";
+    function openDiscord(e) {
+        e.preventDefault();
+        window.location.assign(APP);
+        setTimeout(() => { window.location.assign(INVITE); }, 900);
     }
-
-    const apiBase=()=> (pref.api||'').replace(/\/+$/,'');
-    async function apiFetch(path,opts={}){
-      const init={method:'GET',headers:{'X-Panel-Secret':pref.secret,'Content-Type':'application/json'},...opts};
-      const url=apiBase()+path;
-      const r=await fetch(url,init);
-      if(!r.ok){ const t=await r.text().catch(()=>String(r.status)); throw new Error(`${r.status} ${t.slice(0,200)}`); }
-      const ct=r.headers.get('content-type')||''; return ct.includes('application/json')?r.json():r.text();
-    }
-    async function doAction(path,body){
-      $('msg').textContent='Working…';
-      try{
-        const res=await apiFetch(path,{method:'POST',body:body?JSON.stringify(body):undefined});
-        $('msg').textContent=typeof res==='string'?res:'Done'; toast('Success');
-        await refresh(); if(path.startsWith('/keys')) await loadKeys(); return res;
-      }catch(e){ $('msg').textContent=`Error: ${e.message}`; toast('Failed'); throw e; }
-    }
-
-    let allKeys=[]; let page=1; let selected=new Set();
-
-    function countsStr(arr){
-      const total=arr.length;
-      const active=arr.filter(k=>!(k.status||'').toLowerCase().includes('revok')).length;
-      const revoked=total-active;
-      return {total,active,revoked, text:`Total ${total} • Active ${active} • Revoked ${revoked}`};
-    }
-
-    function applyFiltersAndSort(){
-      const q=(pref.query||'').toLowerCase();
-      const filt=pref.filt;
-      let arr=allKeys.filter(k=>{
-        const text=`${k.key} ${k.owner||''} ${k.status||''}`.toLowerCase();
-        if(q && !text.includes(q)) return false;
-        const rev=(k.status||'').toLowerCase().includes('revok');
-        if(filt==='active'&&rev) return false;
-        if(filt==='revoked'&&!rev) return false;
-        return true;
-      });
-      const parts=pref.sort.split(',');
-      const keys=parts.filter(p=>p!=='asc'&&p!=='desc');
-      const dir=(parts.includes('desc')?'desc':'asc');
-      arr.sort((a,b)=>{
-        for(const k of keys){
-          let va=(a[k]||'').toString().toLowerCase();
-          let vb=(b[k]||'').toString().toLowerCase();
-          if(va<vb) return dir==='asc'?-1:1;
-          if(va>vb) return dir==='asc'?1:-1;
-        }
-        return 0;
-      });
-      return arr;
-    }
-
-    function render(){
-      const arr=applyFiltersAndSort();
-      $('counts').textContent=countsStr(arr).text;
-
-      const size=pref.size;
-      const totalPages=Math.max(1, Math.ceil(arr.length/size));
-      if(page>totalPages) page=totalPages;
-      const start=(page-1)*size;
-      const rows=arr.slice(start,start+size);
-
-      $('chips').innerHTML='';
-      if(pref.query){ const chip=document.createElement('div'); chip.className='chip'; chip.textContent=`Search: "${pref.query}" ✕`; chip.onclick=()=>{pref.query=''; $('search').value=''; render();}; $('chips').appendChild(chip);}
-      if(pref.filt!=='all'){ const chip=document.createElement('div'); chip.className='chip'; chip.textContent=`Status: ${pref.filt} ✕`; chip.onclick=()=>{pref.filt='all'; $('statusFilter').value='all'; render();}; $('chips').appendChild(chip);}
-      if(pref.sort!=='owner,key,asc'){ const chip=document.createElement('div'); chip.className='chip'; chip.textContent=`Sort: ${pref.sort} ✕`; chip.onclick=()=>{pref.sort='owner,key,asc'; $('sortSel').value='owner,key,asc'; render();}; $('chips').appendChild(chip);}
-
-      const header=`
-        <table class="table">
-          <thead>
-            <tr>
-              <th style="width:42px"><input type="checkbox" id="selAll"></th>
-              <th>Owner</th>
-              <th>Key</th>
-              <th>Status</th>
-              <th class="ta-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-      const body=rows.map(k=>{
-        const rev=(k.status||'').toLowerCase().includes('revok');
-        const checked=selected.has(k.key)?'checked':'';
-        return `
-          <tr class="key-row ${rev?'rev':''}">
-            <td><input type="checkbox" class="selRow" data-k="${k.key}" ${checked}></td>
-            <td contenteditable="true" data-edit-owner="${k.key}" spellcheck="false">${k.owner||''}</td>
-            <td class="cell-mono" data-copy="${k.key}">${k.key}</td>
-            <td>${rev?'<span class="badge b-bad">REVOKED</span>':'<span class="badge b-ok">ACTIVE</span>'}</td>
-            <td class="ta-right">
-              ${rev?`<button class="btn-rim" data-unrevoke="${k.key}">Unrevoke</button>`
-                  :`<button class="btn-danger" data-revoke="${k.key}">Revoke</button>`}
-              <button class="btn-ghost" data-del="${k.key}">Delete</button>
-            </td>
-          </tr>`;
-      }).join('');
-      $('keys').innerHTML = '<div class="scroll-x">' + header + body + '</tbody></table></div>';
-
-      const selAll=$('keys').querySelector('#selAll');
-      if(selAll){
-        selAll.onclick=(e)=>{
-          const check=e.target.checked;
-          rows.forEach(k=>{ if(check) selected.add(k.key); else selected.delete(k.key); });
-          render();
-        };
-      }
-      $('selCount').textContent = `${selected.size} selected`;
-
-      $('keys').addEventListener('click', rowHandler, {once:true});
-
-      $('pageInfo').textContent=`Page ${page}/${totalPages}`;
-      $('prevPage').disabled = page<=1;
-      $('nextPage').disabled = page>=totalPages;
-    }
-
-    function rowHandler(e){
-      const t=e.target;
-      const copy=t.closest('[data-copy]');
-      const revoke=t.closest('[data-revoke]');
-      const unrevoke=t.closest('[data-unrevoke]');
-      const del=t.closest('[data-del]');
-      const sel=t.closest('.selRow');
-      const ed=t.closest('[data-edit-owner]');
-
-      if(copy){ navigator.clipboard.writeText(copy.dataset.copy).then(()=>toast('Key copied')); return; }
-      if(sel){ const key=sel.dataset.k; if(sel.checked) selected.add(key); else selected.delete(key); $('selCount').textContent = `${selected.size} selected`; return; }
-
-      if(ed && (e.type==='click' || e.type==='blur')){
-        ed.addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); ed.blur(); } }, {once:true});
-        ed.addEventListener('blur', async ()=>{
-          const key=ed.dataset.editOwner;
-          const owner=ed.textContent.trim();
-          try{ await doAction('/keys/owner',{key,owner}); logActivity(`Owner changed → ${owner} (${key.slice(0,6)}…)`);}catch{}
-        }, {once:true});
-        return;
-      }
-
-      if(revoke){
-        const key=revoke.dataset.revoke;
-        confirmDialog('Revoke this key?','Users will be blocked until unrevoked.').then(async ok=>{
-          if(!ok) return;
-          try{ await doAction('/keys/revoke',{key}); logActivity(`Revoked ${key.slice(0,6)}…`); toast('Revoked'); }catch{}
-        });
-        return;
-      }
-      if(unrevoke){
-        const key=unrevoke.dataset.unrevoke;
-        doAction('/keys/unrevoke',{key}).then(()=>{ logActivity(`Unrevoked ${key.slice(0,6)}…)`); toast('Unrevoked'); }).catch(()=>{});
-        return;
-      }
-      if(del){
-        const key=del.dataset.del;
-        confirmDialog('Delete this key?','Permanent removal.').then(async ok=>{
-          if(!ok) return;
-          try{ await doAction('/keys/delete',{key}); logActivity(`Deleted ${key.slice(0,6)}…`); toast('Deleted'); }catch{}
-        });
-        return;
-      }
-    }
-
-    function logActivity(s){
-      const time=new Date().toLocaleTimeString();
-      const div=document.createElement('div');
-      div.textContent=`[${time}] ${s}`;
-      $('activity').prepend(div);
-      while($('activity').children.length>30) $('activity').lastChild.remove();
-    }
-
-    function toCSV(keys){ return 'key,owner,status\n'+keys.map(k=>`${k.key},${k.owner||''},${k.status||''}`).join('\n')+'\n'; }
-    function download(name, text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'})); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
-    function parseCSV(text){ const lines=text.trim().split(/\r?\n/), out=[]; for(let i=1;i<lines.length;i++){ const [key,owner,status]=lines[i].split(','); if(key) out.push({key:key.trim(), owner:(owner||'').trim(), status:(status||'').trim()}); } return out; }
-
-    async function refresh(){
-      try{
-        const j=await apiFetch('/status');
-        setBadge($('c'),!!j.cronix); setDot($('dot-c'),!!j.cronix);
-        $('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString();
-        $('msg').textContent='Ready';
-      }catch(e){
-        setBadge($('c'),false); setDot($('dot-c'),false); $('msg').textContent='Status error';
-      }
-    }
-    function setBadge(el,up){ el.textContent=up?'ONLINE':'OFFLINE'; el.className='badge '+(up?'b-ok':'b-bad'); document.title = `CRONIX — ${up?'ONLINE':'OFFLINE'}`; }
-    function setDot(el,up){ el.className='dot '+(up?'ok':'bad'); }
-
-    async function loadKeys(){
-      $('keys').innerHTML = `<div class="scroll-x"><div style="height:140px;border:1px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Loading…</div></div>`;
-      try{
-        const j=await apiFetch('/keys');
-        allKeys=j.keys||[];
-        render();
-      }catch{ $('keys').textContent='Failed to load keys'; }
-    }
-
-    async function bulk(type){
-      if(selected.size===0){ toast('Select some keys'); return; }
-      const keys=[...selected];
-      if(type==='revoke'){
-        const ok=await confirmDialog(`Revoke ${keys.length} keys?`,'Users will be blocked.'); if(!ok) return;
-        await Promise.all(keys.map(key=>doAction('/keys/revoke',{key}).catch(()=>{}))); toast('Revoked selected'); logActivity(`Bulk revoke: ${keys.length}`);
-      }else if(type==='unrevoke'){
-        await Promise.all(keys.map(key=>doAction('/keys/unrevoke',{key}).catch(()=>{}))); toast('Unrevoked selected'); logActivity(`Bulk unrevoke: ${keys.length}`);
-      }else if(type==='delete'){
-        const ok=await confirmDialog(`Delete ${keys.length} keys?`,'Permanent removal.'); if(!ok) return;
-        await Promise.all(keys.map(key=>doAction('/keys/delete',{key}).catch(()=>{}))); toast('Deleted selected'); logActivity(`Bulk delete: ${keys.length}`);
-      }
-      selected.clear(); render();
-    }
-
-    function savePrefsUI(){
-      $('sortSel').value=pref.sort;
-      $('pageSize').value=String(pref.size);
-      $('statusFilter').value=pref.filt;
-      $('search').value=pref.query;
-      $('autoRefresh').checked=pref.auto;
-    }
-
-    document.addEventListener('click',async e=>{
-      const b=e.target.closest('button[data-act]'); if(!b) return;
-      const path=b.dataset.act;
-      if(b.dataset.confirm){ const ok=await confirmDialog(b.dataset.confirm); if(!ok) return; }
-      doAction(path);
+    document.querySelectorAll(".discord-link").forEach(a => {
+        a.addEventListener("click", openDiscord);
     });
-    $('refreshBtn').onclick=()=>{refresh(); loadKeys();};
-    $('refreshBtn2').onclick=()=>{refresh(); loadKeys();};
-
-    let st=null;
-    $('search').addEventListener('input',()=>{ clearTimeout(st); st=setTimeout(()=>{ pref.query=$('search').value.trim(); page=1; render(); }, 120); });
-    window.addEventListener('keydown',e=>{ if(e.key==='/' && document.activeElement!==$('search')){ e.preventDefault(); $('search').focus(); } });
-
-    $('statusFilter').onchange=()=>{ pref.filt=$('statusFilter').value; page=1; render(); };
-    $('sortSel').onchange=()=>{ pref.sort=$('sortSel').value; page=1; render(); };
-    $('pageSize').onchange=()=>{ pref.size=parseInt($('pageSize').value); page=1; render(); };
-
-    $('prevPage').onclick=()=>{ if(page>1){ page--; render(); } };
-    $('nextPage').onclick=()=>{ page++; render(); };
-
-    $('btnGen').onclick=async()=>{
-      const owner=($('owner').value||'manual').trim();
-      const n=Math.max(1,Math.min(100,parseInt($('count').value||'1')));
-      const res=await doAction('/keys/generate',{n,owner});
-      const keys=(res&&Array.isArray(res.created))?res.created:[];
-      if(keys.length){ await loadKeys(); logActivity(`Generated ${keys.length} → ${owner}`); try{ await navigator.clipboard.writeText(keys.join('\n')); toast('Keys copied'); }catch{} }
-      else toast('No keys returned');
-    };
-    $('btnAdd').onclick=async()=>{
-      const key=($('keyval').value||'').trim().toLowerCase(); if(!key){ toast('Enter a key'); return; }
-      const owner=($('newowner').value||'manual').trim();
-      await doAction('/keys/add',{key,owner}); await loadKeys(); logActivity(`Added ${key.slice(0,6)}… → ${owner}`);
-    };
-
-    $('bulkRevoke').onclick=()=>bulk('revoke');
-    $('bulkUnrevoke').onclick=()=>bulk('unrevoke');
-    $('bulkDelete').onclick=()=>bulk('delete');
-
-    $('copyAll').onclick=async()=>{
-      const arr=applyFiltersAndSort(); const text=arr.map(k=>k.key).join('\n');
-      try{ await navigator.clipboard.writeText(text); toast('All keys copied'); }catch{ toast('Copy failed'); }
-    };
-
-    $('exportCsv').onclick=()=>{ const csv=toCSV(applyFiltersAndSort()); download('cronix-keys.csv', csv); };
-    $('importCsvBtn').onclick=()=>$('importCsv').click();
-    $('importCsv').onchange=async(e)=>{
-      const file=e.target.files[0]; if(!file) return;
-      const text=await file.text(); const rows=parseCSV(text);
-      if(!rows.length){ toast('Empty CSV'); return; }
-      const ok=await confirmDialog(`Import ${rows.length} keys?`,'Existing duplicates may fail.');
-      if(!ok) return;
-      for(const r of rows){ try{ await doAction('/keys/add',{key:r.key.trim(), owner:r.owner||'import'});}catch{} }
-      await loadKeys(); logActivity(`Imported ${rows.length} from CSV`);
-    };
-
-    let timer=null;
-    function setAuto(b){ if(timer){ clearInterval(timer); timer=null; } if(b){ timer=setInterval(()=>{ refresh(); loadKeys(); }, 5000); } }
-    $('autoRefresh').onchange=()=>{ pref.auto=$('autoRefresh').checked; setAuto(pref.auto); };
-
-    savePrefsUI(); refresh(); loadKeys(); setAuto(pref.auto);
-  </script>
+    })();
+    const emberCount = 30;
+    for (let i = 0; i < emberCount; i++) {
+    const ember = document.createElement("div");
+    ember.className = "ember";
+    ember.style.left = Math.random() * 100 + "vw";
+    ember.style.animationDuration = 6 + Math.random() * 6 + "s";
+    ember.style.animationDelay = Math.random() * 8 + "s";
+    document.body.appendChild(ember);
+    }
+</script>
 </body>
 </html>
