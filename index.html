@@ -183,13 +183,13 @@
   <header class="hero">
     <div class="logo"></div>
     <h1 class="soft-glow">CRONIX Admin Panel</h1>
-    <p>Manage keys & control Cronix's backend.</p>
+    <p>Stuff to manage keys & control Cronix's backend.</p>
   </header>
 
   <div class="sheet">
     <div class="card" role="region" aria-label="Cronix One-Page Panel">
       <div class="hdr">
-        <div class="title">Control Center <span class="sub" id="lastRefresh">—</span></div>
+        <div class="title">Status <span class="sub" id="lastRefresh">—</span></div>
 
         <div class="row">
           <span class="pill">
@@ -301,7 +301,7 @@
   <script>
     /* ================== Logic ================== */
 
-    const DEFAULTS={API:"https://9ed41e73e5f8.ngrok.app",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
+    const DEFAULTS={API:"https://a63eb6fa16a9.ngrok.app/",SECRET:"kh1z-ctrl-1_FQ9k6rTA2z3iG4pN7sY0w"};
     const store={ g:k=>localStorage.getItem(k), s:(k,v)=>localStorage.setItem(k,v) };
     const pref={
       get api(){return store.g('cronix_api')||DEFAULTS.API}, set api(v){store.s('cronix_api',v)},
