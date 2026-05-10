@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smartbizz Business Retail Platform</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Smartbizz Business Retail Platform</h1>
+    <div id="userInfo"></div>
+  </header>
+
+  <main class="container">
+    <section id="loginSection" class="card">
+      <h2>Login</h2>
+      <form id="loginForm" class="grid-form">
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Sign In</button>
+      </form>
+      <p class="hint">Default admin: <code>admin</code> / <code>admin123</code></p>
+      <p id="loginError" class="error"></p>
+    </section>
+
+    <section id="appSection" class="hidden">
+      <nav class="tabs">
+        <button data-tab="dashboard" class="active">Dashboard</button>
+        <button data-tab="customers">Customers</button>
+        <button data-tab="inventory">Inventory</button>
+        <button data-tab="sales">POS Sales</button>
+        <button data-tab="reports">Reports</button>
+        <button data-tab="users">Users</button>
+        <button id="logoutBtn" class="danger">Logout</button>
+      </nav>
+
+      <section id="dashboard" class="tab-content card"></section>
+
+      <section id="customers" class="tab-content card hidden">
+        <h2>Customer Management</h2>
+        <form id="customerForm" class="grid-form">
+          <input type="hidden" id="customerId" />
+          <input type="text" id="customerName" placeholder="Name" required />
+          <input type="email" id="customerEmail" placeholder="Email" />
+          <input type="text" id="customerPhone" placeholder="Phone" />
+          <input type="text" id="customerAddress" placeholder="Address" />
+          <button type="submit">Save Customer</button>
+        </form>
+        <input type="text" id="customerSearch" placeholder="Search customers" />
+        <div id="customersTable"></div>
+      </section>
+
+      <section id="inventory" class="tab-content card hidden">
+        <h2>Inventory Management</h2>
+        <form id="productForm" class="grid-form">
+          <input type="hidden" id="productId" />
+          <input type="text" id="productSku" placeholder="SKU" required />
+          <input type="text" id="productName" placeholder="Product Name" required />
+          <input type="number" id="productPrice" placeholder="Price" step="0.01" min="0" required />
+          <input type="number" id="productStock" placeholder="Stock Qty" min="0" required />
+          <button type="submit">Save Product</button>
+        </form>
+        <h3>Low Stock Alerts (<=10)</h3>
+        <div id="lowStockList"></div>
+        <div id="productsTable"></div>
+      </section>
+
+      <section id="sales" class="tab-content card hidden">
+        <h2>Sales Management (POS)</h2>
+        <form id="saleForm" class="grid-form">
+          <select id="saleCustomer"></select>
+          <select id="saleProduct"></select>
+          <input type="number" id="saleQty" min="1" value="1" required />
+          <button type="button" id="addSaleItem">Add Item</button>
+          <button type="submit">Complete Sale</button>
+        </form>
+        <div id="saleCart"></div>
+        <div id="salesList"></div>
+        <div id="receiptView"></div>
+      </section>
+
+      <section id="reports" class="tab-content card hidden">
+        <h2>Reporting & Analytics</h2>
+        <div id="reportsView"></div>
+      </section>
+
+      <section id="users" class="tab-content card hidden">
+        <h2>User Authentication & Roles</h2>
+        <form id="userForm" class="grid-form">
+          <input type="text" id="newFullName" placeholder="Full Name" required />
+          <input type="text" id="newUsername" placeholder="Username" required />
+          <input type="password" id="newPassword" placeholder="Password" required />
+          <select id="newRole">
+            <option value="staff">Staff</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button type="submit">Create User</button>
+        </form>
+        <div id="usersList"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
