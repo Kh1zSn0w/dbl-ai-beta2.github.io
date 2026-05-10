@@ -113,6 +113,48 @@ def init_db():
             ),
         )
 
+    existing_customers = cur.execute("SELECT id FROM customers LIMIT 1").fetchone()
+    if not existing_customers:
+        sample_customers = [
+            ("Amira Khan", "amira.khan@email.com", "+971501112233", "Business Bay, Dubai"),
+            ("Rayan Foodstuff LLC", "procurement@rayanfoods.ae", "+97143214567", "Al Quoz Industrial Area, Dubai"),
+            ("Noor Families Mart", "owner@noorfamilies.com", "+971526667778", "Al Nahda, Sharjah"),
+            ("Safa Convenience Store", "orders@safastore.ae", "+971558889991", "Karama, Dubai"),
+            ("West Creek Pharmacy", "manager@westcreekpharmacy.ae", "+97143765432", "Bur Dubai, Dubai"),
+        ]
+        now = datetime.now(timezone.utc).isoformat()
+        for customer in sample_customers:
+            cur.execute(
+                "INSERT INTO customers (name, email, phone, address, created_at) VALUES (?, ?, ?, ?, ?)",
+                (customer[0], customer[1], customer[2], customer[3], now),
+            )
+
+    existing_products = cur.execute("SELECT id FROM products LIMIT 1").fetchone()
+    if not existing_products:
+        sample_products = [
+            ("RICE-5KG", "Basmati Rice 5kg Premium", 29.95, 48),
+            ("SUGAR-2KG", "Refined White Sugar 2kg", 8.75, 82),
+            ("OIL-1.8L", "Sunflower Cooking Oil 1.8L", 14.50, 31),
+            ("MILK-UHT", "UHT Whole Milk 1L", 4.25, 96),
+            ("TEA-100", "Ceylon Black Tea 100 Bags", 12.99, 54),
+            ("SOAP-4PK", "Moisturizing Soap Bar 4-Pack", 9.40, 25),
+            ("TISSUE-10", "Facial Tissue Box 10-Pack", 19.90, 14),
+            ("PASTA-500", "Durum Wheat Pasta 500g", 5.20, 62),
+            ("WATER-24", "Mineral Water 500ml x24", 17.30, 40),
+            ("DETER-3L", "Laundry Detergent 3L", 26.00, 11),
+            ("BATT-AA8", "Alkaline AA Batteries 8-Pack", 13.50, 9),
+            ("SNACK-MIX", "Family Snack Mix 400g", 10.80, 18),
+        ]
+        now = datetime.now(timezone.utc).isoformat()
+        for sku, name, price, stock in sample_products:
+            cur.execute(
+                """
+                INSERT INTO products (sku, name, price, stock_quantity, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (sku, name, price, stock, now, now),
+            )
+
     conn.commit()
     conn.close()
 

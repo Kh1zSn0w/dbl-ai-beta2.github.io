@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smartbizz Business Retail Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h1>Smartbizz Business Retail Platform</h1>
-    <div id="userInfo"></div>
-  </header>
-
-  <main class="container">
-    <section id="loginSection" class="card">
-      <h2>Login</h2>
+  <section id="loginSection" class="login-shell">
+    <div class="login-card">
+      <p class="eyebrow">Smartbizz Retail Suite</p>
+      <h1>Smartbizz Business Retail Platform</h1>
+      <p class="subtitle">Centralized operations for customers, stock, POS, and analytics.</p>
       <form id="loginForm" class="grid-form">
         <input type="text" id="username" placeholder="Username" required />
         <input type="password" id="password" placeholder="Password" required />
@@ -22,71 +22,84 @@
       </form>
       <p class="hint">Default admin: <code>admin</code> / <code>admin123</code></p>
       <p id="loginError" class="error"></p>
-    </section>
+    </div>
+  </section>
 
-    <section id="appSection" class="hidden">
-      <nav class="tabs">
+  <main id="appSection" class="app-shell hidden">
+    <aside class="sidebar">
+      <div>
+        <p class="eyebrow">Smartbizz</p>
+        <h2>Retail Command Center</h2>
+      </div>
+      <nav class="nav-stack">
         <button data-tab="dashboard" class="active">Dashboard</button>
         <button data-tab="customers">Customers</button>
         <button data-tab="inventory">Inventory</button>
         <button data-tab="sales">POS Sales</button>
         <button data-tab="reports">Reports</button>
-        <button data-tab="users">Users</button>
-        <button id="logoutBtn" class="danger">Logout</button>
+        <button data-tab="users">Team Access</button>
       </nav>
+      <button id="logoutBtn" class="danger">Logout</button>
+    </aside>
+
+    <section class="workspace">
+      <header class="workspace-head card">
+        <h1>Smartbizz Business Retail Platform</h1>
+        <div id="userInfo" class="tag"></div>
+      </header>
 
       <section id="dashboard" class="tab-content card"></section>
 
       <section id="customers" class="tab-content card hidden">
-        <h2>Customer Management</h2>
+        <div class="section-head"><h2>Customer Management</h2></div>
         <form id="customerForm" class="grid-form">
           <input type="hidden" id="customerId" />
-          <input type="text" id="customerName" placeholder="Name" required />
+          <input type="text" id="customerName" placeholder="Customer Name" required />
           <input type="email" id="customerEmail" placeholder="Email" />
           <input type="text" id="customerPhone" placeholder="Phone" />
           <input type="text" id="customerAddress" placeholder="Address" />
           <button type="submit">Save Customer</button>
         </form>
-        <input type="text" id="customerSearch" placeholder="Search customers" />
+        <input type="text" id="customerSearch" placeholder="Search by name, email, phone" />
         <div id="customersTable"></div>
       </section>
 
       <section id="inventory" class="tab-content card hidden">
-        <h2>Inventory Management</h2>
+        <div class="section-head"><h2>Inventory Management</h2></div>
         <form id="productForm" class="grid-form">
           <input type="hidden" id="productId" />
           <input type="text" id="productSku" placeholder="SKU" required />
           <input type="text" id="productName" placeholder="Product Name" required />
-          <input type="number" id="productPrice" placeholder="Price" step="0.01" min="0" required />
+          <input type="number" id="productPrice" placeholder="Unit Price" step="0.01" min="0" required />
           <input type="number" id="productStock" placeholder="Stock Qty" min="0" required />
           <button type="submit">Save Product</button>
         </form>
-        <h3>Low Stock Alerts (<=10)</h3>
-        <div id="lowStockList"></div>
+        <h3>Low Stock Alerts</h3>
+        <div id="lowStockList" class="alert-row"></div>
         <div id="productsTable"></div>
       </section>
 
       <section id="sales" class="tab-content card hidden">
-        <h2>Sales Management (POS)</h2>
+        <div class="section-head"><h2>POS Sales</h2></div>
         <form id="saleForm" class="grid-form">
           <select id="saleCustomer"></select>
           <select id="saleProduct"></select>
           <input type="number" id="saleQty" min="1" value="1" required />
-          <button type="button" id="addSaleItem">Add Item</button>
+          <button type="button" id="addSaleItem">Add to Cart</button>
           <button type="submit">Complete Sale</button>
         </form>
         <div id="saleCart"></div>
-        <div id="salesList"></div>
         <div id="receiptView"></div>
+        <div id="salesList"></div>
       </section>
 
       <section id="reports" class="tab-content card hidden">
-        <h2>Reporting & Analytics</h2>
+        <div class="section-head"><h2>Reports & Analytics</h2></div>
         <div id="reportsView"></div>
       </section>
 
       <section id="users" class="tab-content card hidden">
-        <h2>User Authentication & Roles</h2>
+        <div class="section-head"><h2>User Authentication & Roles</h2></div>
         <form id="userForm" class="grid-form">
           <input type="text" id="newFullName" placeholder="Full Name" required />
           <input type="text" id="newUsername" placeholder="Username" required />
