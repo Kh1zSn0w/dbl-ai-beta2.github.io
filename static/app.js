@@ -25,6 +25,7 @@ function clearAuth() {
 }
 
 async function api(path, options = {}) {
+  // Single API wrapper keeps auth and error behavior consistent across modules.
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
   if (state.token) headers.Authorization = `Bearer ${state.token}`;
 
@@ -53,6 +54,40 @@ function table(headers, rowsHtml) {
         <tbody>${rowsHtml || `<tr><td colspan="${headers.length}">No data available</td></tr>`}</tbody>
       </table>
     </div>`;
+}
+
+function drawBarChart(canvasId, labels, values, barColor) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+
+  if (!values.length) return;
+  const max = Math.max(...values, 1);
+  const padding = 26;
+  const chartWidth = width - padding * 2;
+  const chartHeight = height - padding * 2;
+  const barGap = 10;
+  const barWidth = Math.max((chartWidth - barGap * (values.length - 1)) / values.length, 8);
+
+  ctx.fillStyle = "#7a4b2f";
+  ctx.font = "12px Manrope";
+  ctx.fillText("0", 6, height - padding + 4);
+  ctx.fillText(String(max), 6, padding + 4);
+
+  values.forEach((v, i) => {
+    const barHeight = (v / max) * chartHeight;
+    const x = padding + i * (barWidth + barGap);
+    const y = height - padding - barHeight;
+
+    ctx.fillStyle = barColor;
+    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fillStyle = "#5b3b2a";
+    ctx.font = "10px Manrope";
+    ctx.fillText(labels[i].slice(-5), x, height - 8);
+  });
 }
 
 function switchTab(tabId) {
@@ -291,8 +326,29 @@ async function loadReports() {
     .map((r) => `<tr><td>${r.sku}</td><td>${r.name}</td><td>${r.stock_quantity}</td></tr>`)
     .join("");
 
+  const dailyValues = sales.daily.slice().reverse().map((r) => Number(r.total_sales || 0));
+  const dailyLabels = sales.daily.slice().reverse().map((r) => r.date);
+  const monthlyValues = sales.monthly.slice().reverse().map((r) => Number(r.total_sales || 0));
+  const monthlyLabels = sales.monthly.slice().reverse().map((r) => r.month);
+  const maxDaily = sales.daily.length ? sales.daily.reduce((a, b) => (Number(a.total_sales) > Number(b.total_sales) ? a : b)) : null;
+  const minDaily = sales.daily.length ? sales.daily.reduce((a, b) => (Number(a.total_sales) < Number(b.total_sales) ? a : b)) : null;
+  const maxMonthly = sales.monthly.length ? sales.monthly.reduce((a, b) => (Number(a.total_sales) > Number(b.total_sales) ? a : b)) : null;
+  const minMonthly = sales.monthly.length ? sales.monthly.reduce((a, b) => (Number(a.total_sales) < Number(b.total_sales) ? a : b)) : null;
+
   reportsView.innerHTML = `
     <h3>Daily Sales (Last 30 Days)</h3>
+    <div class="chart-grid">
+      <article class="chart-card">
+        <canvas id="dailySalesChart" width="560" height="260"></canvas>
+        <p class="chart-note">Daily High: <strong>${maxDaily ? `${maxDaily.date} (${formatMoney(maxDaily.total_sales)})` : "N/A"}</strong></p>
+        <p class="chart-note">Daily Low: <strong>${minDaily ? `${minDaily.date} (${formatMoney(minDaily.total_sales)})` : "N/A"}</strong></p>
+      </article>
+      <article class="chart-card">
+        <canvas id="monthlySalesChart" width="560" height="260"></canvas>
+        <p class="chart-note">Monthly High: <strong>${maxMonthly ? `${maxMonthly.month} (${formatMoney(maxMonthly.total_sales)})` : "N/A"}</strong></p>
+        <p class="chart-note">Monthly Low: <strong>${minMonthly ? `${minMonthly.month} (${formatMoney(minMonthly.total_sales)})` : "N/A"}</strong></p>
+      </article>
+    </div>
     ${table(["Date", "Transactions", "Sales"], dailyRows)}
     <h3>Monthly Sales (Last 12 Months)</h3>
     ${table(["Month", "Transactions", "Sales"], monthlyRows)}
@@ -305,6 +361,10 @@ async function loadReports() {
     <h3>Low Stock SKUs</h3>
     ${table(["SKU", "Item", "Units Left"], lowRows)}
   `;
+
+  // Charts are rendered after HTML insertion so canvas elements exist in the DOM.
+  drawBarChart("dailySalesChart", dailyLabels, dailyValues, "#f97316");
+  drawBarChart("monthlySalesChart", monthlyLabels, monthlyValues, "#fb923c");
 }
 
 async function loadUsers() {
@@ -413,6 +473,7 @@ addSaleItem.addEventListener("click", () => {
   const product = state.products.find((p) => p.id === productId);
   if (!product || qty < 1) return;
 
+  // Merge repeated item scans into one cart line for cashier speed.
   const existing = state.salesCart.find((i) => i.product.id === productId);
   if (existing) {
     existing.qty += qty;

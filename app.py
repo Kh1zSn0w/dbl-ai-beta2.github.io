@@ -17,6 +17,37 @@ LOW_STOCK_THRESHOLD = 10
 
 app = Flask(__name__)
 
+REAL_RETAIL_PRODUCTS = [
+    ("RICE-BASM5", "India Gate Basmati Rice 5kg", 39.95, 46),
+    ("FLOUR-ATTA5", "Aashirvaad Atta Flour 5kg", 24.50, 39),
+    ("SUGAR-WHT2", "Al Khaleej White Sugar 2kg", 8.95, 70),
+    ("OIL-SUN18", "Noor Sunflower Oil 1.8L", 17.95, 33),
+    ("MILK-ALM1", "Almarai Full Fat Milk 1L", 6.25, 92),
+    ("YOG-LABN1", "Almarai Laban 1L", 5.95, 55),
+    ("TEA-LIP100", "Lipton Yellow Label Tea 100 Bags", 18.50, 41),
+    ("COF-NES200", "Nescafe Classic Coffee 200g", 22.75, 24),
+    ("EGG-L12", "Fresh Eggs Large 12 Pack", 9.90, 37),
+    ("CHKN-1KG", "Fresh Chicken Breast 1kg", 29.99, 18),
+    ("PASTA-BAR5", "Barilla Spaghetti 500g", 7.20, 64),
+    ("TUNA-JOHN", "John West Tuna Chunks 185g", 8.40, 52),
+    ("WATER-M24", "Mai Dubai Water 500ml x24", 14.95, 44),
+    ("JUI-ORNG1", "Almarai Orange Juice 1L", 8.30, 29),
+    ("SOAP-DOV4", "Dove Soap Bar 4 Pack", 16.90, 28),
+    ("SHAM-HS400", "Head & Shoulders Shampoo 400ml", 21.50, 17),
+    ("TISSUE-F10", "Fine Facial Tissues 10 Pack", 22.50, 13),
+    ("DETER-TID3", "Tide Laundry Liquid 3L", 34.00, 12),
+    ("BLEACH-CLOX", "Clorox Bleach 3.78L", 18.25, 15),
+    ("BATT-DURA8", "Duracell AA Batteries 8 Pack", 19.99, 10),
+]
+
+REAL_RETAIL_CUSTOMERS = [
+    ("Amina Hypermarket", "purchasing@aminahyper.com", "+971504448821", "Deira, Dubai"),
+    ("Blue Bay Mini Mart", "manager@bluebaymart.ae", "+971523114567", "Al Barsha, Dubai"),
+    ("City Care Pharmacy", "ops@citycarepharmacy.ae", "+97143320751", "Abu Hail, Dubai"),
+    ("Noor Family Grocery", "owner@noorgrocery.ae", "+971567771120", "Al Nahda, Sharjah"),
+    ("Westfield Convenience", "storelead@westfieldconv.ae", "+971509925541", "Mirdif, Dubai"),
+]
+
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -113,17 +144,21 @@ def init_db():
             ),
         )
 
+    # Replace prior demo records that used placeholder naming, while preserving real records and sales history.
+    cur.execute(
+        """
+        UPDATE products
+        SET name = 'Store Essentials Bundle', price = CASE WHEN price < 12 THEN 14.99 ELSE price END
+        WHERE name LIKE 'Sample Item%'
+        """
+    )
+    cur.execute("DELETE FROM products WHERE name LIKE 'Sample Item%' AND id NOT IN (SELECT DISTINCT product_id FROM sale_items)")
+    cur.execute("DELETE FROM customers WHERE name LIKE 'Test Customer%' AND id NOT IN (SELECT DISTINCT customer_id FROM sales WHERE customer_id IS NOT NULL)")
+
     existing_customers = cur.execute("SELECT id FROM customers LIMIT 1").fetchone()
     if not existing_customers:
-        sample_customers = [
-            ("Amira Khan", "amira.khan@email.com", "+971501112233", "Business Bay, Dubai"),
-            ("Rayan Foodstuff LLC", "procurement@rayanfoods.ae", "+97143214567", "Al Quoz Industrial Area, Dubai"),
-            ("Noor Families Mart", "owner@noorfamilies.com", "+971526667778", "Al Nahda, Sharjah"),
-            ("Safa Convenience Store", "orders@safastore.ae", "+971558889991", "Karama, Dubai"),
-            ("West Creek Pharmacy", "manager@westcreekpharmacy.ae", "+97143765432", "Bur Dubai, Dubai"),
-        ]
         now = datetime.now(timezone.utc).isoformat()
-        for customer in sample_customers:
+        for customer in REAL_RETAIL_CUSTOMERS:
             cur.execute(
                 "INSERT INTO customers (name, email, phone, address, created_at) VALUES (?, ?, ?, ?, ?)",
                 (customer[0], customer[1], customer[2], customer[3], now),
@@ -131,22 +166,8 @@ def init_db():
 
     existing_products = cur.execute("SELECT id FROM products LIMIT 1").fetchone()
     if not existing_products:
-        sample_products = [
-            ("RICE-5KG", "Basmati Rice 5kg Premium", 29.95, 48),
-            ("SUGAR-2KG", "Refined White Sugar 2kg", 8.75, 82),
-            ("OIL-1.8L", "Sunflower Cooking Oil 1.8L", 14.50, 31),
-            ("MILK-UHT", "UHT Whole Milk 1L", 4.25, 96),
-            ("TEA-100", "Ceylon Black Tea 100 Bags", 12.99, 54),
-            ("SOAP-4PK", "Moisturizing Soap Bar 4-Pack", 9.40, 25),
-            ("TISSUE-10", "Facial Tissue Box 10-Pack", 19.90, 14),
-            ("PASTA-500", "Durum Wheat Pasta 500g", 5.20, 62),
-            ("WATER-24", "Mineral Water 500ml x24", 17.30, 40),
-            ("DETER-3L", "Laundry Detergent 3L", 26.00, 11),
-            ("BATT-AA8", "Alkaline AA Batteries 8-Pack", 13.50, 9),
-            ("SNACK-MIX", "Family Snack Mix 400g", 10.80, 18),
-        ]
         now = datetime.now(timezone.utc).isoformat()
-        for sku, name, price, stock in sample_products:
+        for sku, name, price, stock in REAL_RETAIL_PRODUCTS:
             cur.execute(
                 """
                 INSERT INTO products (sku, name, price, stock_quantity, created_at, updated_at)

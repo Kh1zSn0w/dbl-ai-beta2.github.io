@@ -1,13 +1,13 @@
 :root {
-  --bg: #f3f5f8;
+  --bg: #fffaf5;
   --card: #ffffff;
-  --text: #0f172a;
-  --muted: #667085;
-  --line: #e2e8f0;
-  --brand: #0b66ff;
-  --brand-2: #13b5a2;
-  --danger: #e53935;
-  --ok: #0a8f5b;
+  --text: #2d1f17;
+  --muted: #826b5b;
+  --line: #efdfd0;
+  --brand: #f97316;
+  --brand-2: #fb923c;
+  --danger: #c62828;
+  --ok: #0f9d58;
 }
 
 * { box-sizing: border-box; }
@@ -16,7 +16,7 @@ body {
   margin: 0;
   font-family: "Manrope", "Segoe UI", sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top left, #e8f1ff 0, #f3f5f8 30%, #f3f5f8 100%);
+  background: radial-gradient(circle at top left, #ffe8d2 0, #fffaf5 30%, #fffaf5 100%);
 }
 
 .hidden { display: none !important; }
@@ -44,8 +44,8 @@ body {
 }
 
 .sidebar {
-  background: linear-gradient(180deg, #0b1d3a 0%, #0a152b 100%);
-  color: #dce6f7;
+  background: linear-gradient(180deg, #4a2d1f 0%, #2f1d14 100%);
+  color: #fef3e9;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -71,7 +71,7 @@ body {
 
 .eyebrow {
   margin: 0;
-  color: #7dd3fc;
+  color: #ffcf9c;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   font-size: 11px;
@@ -90,7 +90,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 18px;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 24px rgba(84, 45, 20, 0.08);
 }
 
 .section-head {
@@ -126,12 +126,12 @@ button {
 .nav-stack button,
 #logoutBtn {
   text-align: left;
-  background: #12284b;
-  border: 1px solid #1f3a67;
+  background: #5f3a28;
+  border: 1px solid #7a4d35;
 }
 
 .nav-stack button.active {
-  background: linear-gradient(120deg, #1e40af, #0284c7);
+  background: linear-gradient(120deg, #f97316, #fb923c);
 }
 
 button.danger { background: #8f2233; }
@@ -147,7 +147,7 @@ table {
 }
 
 th, td { padding: 10px; border-bottom: 1px solid #eef2f7; text-align: left; }
-th { background: #f8fbff; color: #1f2937; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; }
+th { background: #fff5eb; color: #5b3b2a; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; }
 
 .kpi-grid {
   display: grid;
@@ -157,10 +157,10 @@ th { background: #f8fbff; color: #1f2937; font-size: 12px; letter-spacing: 0.03e
 }
 
 .kpi {
-  border: 1px solid #dbe8ff;
+  border: 1px solid #ffd8b5;
   border-radius: 14px;
   padding: 12px;
-  background: linear-gradient(150deg, #f8fbff, #eef6ff);
+  background: linear-gradient(150deg, #fff9f2, #ffeedb);
 }
 
 .kpi p { margin: 0; color: var(--muted); font-size: 12px; }
@@ -172,8 +172,8 @@ th { background: #f8fbff; color: #1f2937; font-size: 12px; letter-spacing: 0.03e
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
-  background: #e9f2ff;
-  color: #0a4db2;
+  background: #ffe8d1;
+  color: #8e4d19;
 }
 
 .tag.low { background: #ffe8e8; color: #9f2c2c; }
@@ -187,10 +187,28 @@ th { background: #f8fbff; color: #1f2937; font-size: 12px; letter-spacing: 0.03e
 }
 
 .receipt-card {
-  border: 1px solid #dce8ff;
+  border: 1px solid #ffd8b5;
   border-radius: 14px;
   padding: 12px;
-  background: #f8fbff;
+  background: #fff8ef;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  background: #fff;
+}
+
+.chart-note {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .error { color: var(--danger); }
